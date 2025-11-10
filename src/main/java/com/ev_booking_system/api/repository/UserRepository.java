@@ -1,8 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+package com.ev_booking_system.api.repository;
 
-class UserRepository {
+import org.springframework.data.mongodb.repository.MongoRepository;
+import com.ev_booking_system.api.model.UserModel;
 
+public interface UserRepository extends MongoRepository<UserModel, String> {
+    UserModel findByEmail(String email);
 }
