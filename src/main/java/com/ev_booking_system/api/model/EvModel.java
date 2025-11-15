@@ -19,5 +19,5 @@ public class EvModel {
     private String registrationNo;
     private String batteryCapacity;
     private String rangePerCharge;
-    String ownerId; // Reference to User (the EV owner)
+    private String ownerId; // Reference to User (the EV owner)
 }

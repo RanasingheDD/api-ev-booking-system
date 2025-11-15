@@ -17,6 +17,7 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
     private EvRepository evRepository;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -68,12 +69,14 @@ public class UserService {
     return new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getRole(),user.getEvIds());
     }
 
-    public EvModel addEv(EvModel evModel) {
+    public EvModel addEV(EvModel evModel) {
         // Optional: check if registrationNo already exists
-        if(evRepository.findByRegistrationNo(evModel.getRegistrationNo()) != null){
+        /*if(evRepository.findByRegistrationNo(evModel.getRegistrationNo()) != null){
             throw new RuntimeException("EV with this registration number already exists");
-        }
+        }*/
         return evRepository.save(evModel);
+
+        //return "addeds";
     }
 
 }

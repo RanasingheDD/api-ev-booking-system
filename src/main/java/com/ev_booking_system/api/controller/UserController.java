@@ -38,7 +38,7 @@ public class UserController {
 
     @PostMapping("/addEv")
     public EvModel addEV(@RequestBody EvModel evModel) { 
-        return userService.addEv(evModel);
+        return userService.addEV(evModel);
     }
     
 
