@@ -1,5 +1,9 @@
 package com.ev_booking_system.api.repository;
 
-public class EvRepository {
-    
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+import com.ev_booking_system.api.model.EvModel;
+
+public interface EvRepository extends MongoRepository<EvModel, String> {
+    EvModel findByRegistrationNo(String registrationNo);
 }

@@ -1,23 +1,16 @@
-package com.ev_booking_system.api.model;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+package com.ev_booking_system.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Document(collection = "evs")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EvModel {
-    @Id
-    private String id;
-
+public class EvDto {
     private String make;
     private String model;
     private String registrationNo;
     private String batteryCapacity;
     private String rangePerCharge;
-    String ownerId; // Reference to User (the EV owner)
 }

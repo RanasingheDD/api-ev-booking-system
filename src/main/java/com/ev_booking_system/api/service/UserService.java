@@ -3,8 +3,9 @@ package com.ev_booking_system.api.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.ev_booking_system.api.dto.UserDto;
+import com.ev_booking_system.api.model.EvModel;
+import com.ev_booking_system.api.repository.EvRepository;
 import com.ev_booking_system.api.model.UserModel;
 import com.ev_booking_system.api.repository.UserRepository;
 
@@ -16,6 +17,7 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    private EvRepository evRepository;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -48,4 +50,30 @@ public class UserService {
     public UserModel getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
+
+    public UserDto loginUser(String email, String password) {
+    UserModel user = userRepository.findByEmail(email);
+
+    if (user == null) {
+        throw new RuntimeException("User not found");
+    }
+
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+    if (!encoder.matches(password, user.getPassword())) {
+        throw new RuntimeException("Invalid password");
+    }
+
+    // Return UserDto (safe data)
+    return new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getRole(),user.getEvIds());
+    }
+
+    public EvModel addEv(EvModel evModel) {
+        // Optional: check if registrationNo already exists
+        if(evRepository.findByRegistrationNo(evModel.getRegistrationNo()) != null){
+            throw new RuntimeException("EV with this registration number already exists");
+        }
+        return evRepository.save(evModel);
+    }
+
 }
