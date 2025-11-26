@@ -8,9 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EvDto {
-    private String make;
     private String model;
     private String registrationNo;
     private String batteryCapacity;
-    private String rangePerCharge;
+    private String speed;
 }

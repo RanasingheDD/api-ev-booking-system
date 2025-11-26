@@ -1,6 +1,8 @@
 package com.ev_booking_system.api.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.ev_booking_system.api.dto.UserDto;
@@ -78,5 +80,19 @@ public class UserService {
 
         //return "addeds";
     }
+    public UserModel getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        return userRepository.findByEmail(username); // or findByUsername()
+    }
+
+    public EvModel findEvForCurrentUser() {
+    UserModel user = getCurrentUser();
+    String id = user.getId();
+    return evRepository.findById(id)
+           .orElseThrow(() -> new RuntimeException("EV not found for user: " + id));
+    }
+
 
 }
