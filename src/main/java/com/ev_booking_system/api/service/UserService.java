@@ -23,7 +23,7 @@ public class UserService {
     private EvRepository evRepository;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
+    
     public UserModel registerUser(UserModel user) {
         // Check if user already exists
         if (userRepository.findByEmail(user.getEmail()) != null) {
