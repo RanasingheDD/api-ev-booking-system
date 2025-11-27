@@ -14,6 +14,7 @@ public class StationService {
     @Autowired
     private StationRepository stationRepository;
 
+    // Other service methods...
     public Optional<StationModel> getStationById(String id) {
         return stationRepository.findById(id);
     }
