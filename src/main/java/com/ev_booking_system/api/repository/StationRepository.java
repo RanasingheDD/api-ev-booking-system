@@ -8,5 +8,4 @@ import com.ev_booking_system.api.model.StationModel;
 @Repository
 public interface StationRepository extends MongoRepository<StationModel, String> {
 
-    StationModel findByUsername(String username);
 }
