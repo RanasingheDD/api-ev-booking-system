@@ -101,6 +101,30 @@ public class UserService {
     return evRepository.findById(id)
            .orElseThrow(() -> new RuntimeException("EV not found for user: " + id));
     }
+    public UserDto updateUser(String email, UserDto updatedUser) {
+        // Find existing user
+        UserModel user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        // Update fields
+        if (updatedUser.getUsername() != null) {
+            user.setUsername(updatedUser.getUsername());
+        }
+        // Optionally allow updating email:
+        // if (updatedUser.getEmail() != null) user.setEmail(updatedUser.getEmail());
+
+        // Save updated user
+        UserModel savedUser = userRepository.save(user);
+
+        // Convert to UserDto
+        UserDto dto = new UserDto();
+        dto.setUsername(savedUser.getUsername());
+        // add other fields if needed
+
+        return dto;
+    }
 
 
 }
