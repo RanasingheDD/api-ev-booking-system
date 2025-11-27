@@ -1,6 +1,5 @@
 package com.ev_booking_system.api.service;
 
-import com.ev_booking_system.api.Util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,12 +22,8 @@ public class UserService {
     @Autowired
     private EvRepository evRepository;
 
-    @Autowired
-    private JwtUtil jwtUtil;
-
-
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    
+
     public UserModel registerUser(UserModel user) {
         // Check if user already exists
         if (userRepository.findByEmail(user.getEmail()) != null) {
@@ -60,23 +55,20 @@ public class UserService {
     }
 
     public UserDto loginUser(String email, String password) {
-    UserModel user = userRepository.findByEmail(email);
+        UserModel user = userRepository.findByEmail(email);
 
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
 
-    if (user == null) {
-        throw new RuntimeException("User not found");
-    }
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-
-    if (!encoder.matches(password, user.getPassword())) {
-        throw new RuntimeException("Invalid password");
-    }
-
-      String token = jwtUtil.generateToken(user.getEmail());
+        if (!encoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
 
         // Return UserDto (safe data)
-    return new UserDto(token,user.getId(), user.getUsername(), user.getEmail(), user.getRole(),user.getEvIds());
+        return new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getRole(), user.getEvIds());
     }
 
     public EvModel addEV(EvModel evModel) {
@@ -88,6 +80,7 @@ public class UserService {
 
         //return "addeds";
     }
+
     public UserModel getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
@@ -96,11 +89,12 @@ public class UserService {
     }
 
     public EvModel findEvForCurrentUser() {
-    UserModel user = getCurrentUser();
-    String id = user.getId();
-    return evRepository.findById(id)
-           .orElseThrow(() -> new RuntimeException("EV not found for user: " + id));
+        UserModel user = getCurrentUser();
+        String id = user.getId();
+        return evRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("EV not found for user: " + id));
     }
+
     public UserDto updateUser(String email, UserDto updatedUser) {
         // Find existing user
         UserModel user = userRepository.findByEmail(email);
@@ -125,6 +119,5 @@ public class UserService {
 
         return dto;
     }
-
 
 }
