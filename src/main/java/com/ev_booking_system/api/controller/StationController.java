@@ -1,5 +1,7 @@
 package com.ev_booking_system.api.controller;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,18 +14,23 @@ import com.ev_booking_system.api.repository.StationRepository;
 public class StationController {
 
     @Autowired
-    private StationRepository StationRepository;
+    private StationRepository stationRepository;
 
     // Add a new EV
     @PostMapping("/add")
     public ResponseEntity<StationModel> addEv(@RequestBody StationModel stationModel) {
-        StationModel savedEv = StationRepository.save(stationModel);
+        StationModel savedEv = stationRepository.save(stationModel);
         return ResponseEntity.ok(savedEv);
     }
 
     // Optional: List all EVs
     @GetMapping("/all")
     public ResponseEntity<?> getAllEvs() {
-        return ResponseEntity.ok(StationRepository.findAll());
+        return ResponseEntity.ok(stationRepository.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public Optional<StationModel> getStationById(@PathVariable String id) {
+        return stationRepository.findById(id);
     }
 }

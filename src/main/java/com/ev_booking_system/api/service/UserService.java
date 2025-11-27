@@ -23,7 +23,7 @@ public class UserService {
     private EvRepository evRepository;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    
+
     public UserModel registerUser(UserModel user) {
         // Check if user already exists
         if (userRepository.findByEmail(user.getEmail()) != null) {
@@ -55,20 +55,20 @@ public class UserService {
     }
 
     public UserDto loginUser(String email, String password) {
-    UserModel user = userRepository.findByEmail(email);
+        UserModel user = userRepository.findByEmail(email);
 
-    if (user == null) {
-        throw new RuntimeException("User not found");
-    }
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
 
-    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    if (!encoder.matches(password, user.getPassword())) {
-        throw new RuntimeException("Invalid password");
-    }
+        if (!encoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
 
-    // Return UserDto (safe data)
-    return new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getRole(),user.getEvIds());
+        // Return UserDto (safe data)
+        return new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getRole(), user.getEvIds());
     }
 
     public EvModel addEV(EvModel evModel) {
@@ -80,6 +80,7 @@ public class UserService {
 
         //return "addeds";
     }
+
     public UserModel getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
@@ -88,11 +89,35 @@ public class UserService {
     }
 
     public EvModel findEvForCurrentUser() {
-    UserModel user = getCurrentUser();
-    String id = user.getId();
-    return evRepository.findById(id)
-           .orElseThrow(() -> new RuntimeException("EV not found for user: " + id));
+        UserModel user = getCurrentUser();
+        String id = user.getId();
+        return evRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("EV not found for user: " + id));
     }
 
+    public UserDto updateUser(String email, UserDto updatedUser) {
+        // Find existing user
+        UserModel user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        // Update fields
+        if (updatedUser.getUsername() != null) {
+            user.setUsername(updatedUser.getUsername());
+        }
+        // Optionally allow updating email:
+        // if (updatedUser.getEmail() != null) user.setEmail(updatedUser.getEmail());
+
+        // Save updated user
+        UserModel savedUser = userRepository.save(user);
+
+        // Convert to UserDto
+        UserDto dto = new UserDto();
+        dto.setUsername(savedUser.getUsername());
+        // add other fields if needed
+
+        return dto;
+    }
 
 }
