@@ -1,5 +1,6 @@
 package com.ev_booking_system.api.service;
 
+import com.ev_booking_system.api.Util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +22,8 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private EvRepository evRepository;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -56,9 +59,14 @@ public class UserService {
 
     public UserDto loginUser(String email, String password) {
         UserModel user = userRepository.findByEmail(email);
+        System.out.println("LOGIN EMAIL = " + email);
+
+
 
         if (user == null) {
+            System.out.println("USER = " + user);
             throw new RuntimeException("User not found");
+
         }
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -67,8 +75,10 @@ public class UserService {
             throw new RuntimeException("Invalid password");
         }
 
+        String token = jwtUtil.generateToken(user.getEmail());
+
         // Return UserDto (safe data)
-        return new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getRole(), user.getEvIds());
+        return new UserDto(token,user.getId(), user.getUsername(), user.getEmail(), user.getRole(),user.getEvIds());
     }
 
     public EvModel addEV(EvModel evModel) {
