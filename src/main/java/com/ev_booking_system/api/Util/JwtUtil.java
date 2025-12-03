@@ -10,7 +10,7 @@ import java.util.Date;
 public class JwtUtil {
 
     private final String SECRET = "thisIsASecretKeyWithAtLeast32Characters!";
-    private final long EXPIRATION = 1000 * 60 * 60 * 24; // 1 day
+    private final long EXPIRATION = 1000 * 60 *60*3 ; // 1 day
 
     public String generateToken(String email) {
         return Jwts.builder()
@@ -28,17 +28,23 @@ public class JwtUtil {
 
     public boolean validateToken(String token) {
         try {
-            parseClaims(token);
-            return true;
+            return !isTokenExpired(token);
         } catch (Exception e) {
             return false;
         }
     }
 
+    public boolean isTokenExpired(String token) {
+        Date expiration = parseClaims(token).getExpiration();
+        return expiration.before(new Date());
+    }
+
+
     private Claims parseClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(SECRET)
+                .setSigningKey(Keys.hmacShaKeyFor(SECRET.getBytes()))
                 .parseClaimsJws(token)
                 .getBody();
     }
+
 }
