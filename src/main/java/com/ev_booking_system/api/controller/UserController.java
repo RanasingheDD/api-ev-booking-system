@@ -35,7 +35,7 @@ public class UserController {
         }
 
         user.setRole("USER");
-        userRepository.save(user);
+        userService.registerUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
     }
 

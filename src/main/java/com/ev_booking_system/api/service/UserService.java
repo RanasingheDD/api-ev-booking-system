@@ -25,17 +25,17 @@ public class UserService {
     @Autowired
     private JwtUtil jwtUtil;
 
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     public UserModel registerUser(UserModel user) {
         // Check if user already exists
         if (userRepository.findByEmail(user.getEmail()) != null) {
             throw new RuntimeException("Email already registered!");
         }
-
         // Encrypt password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
+        System.out.println(user.getPassword());
         return userRepository.save(user);
     }
 
