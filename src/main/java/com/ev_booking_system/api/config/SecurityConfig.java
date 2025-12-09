@@ -1,16 +1,14 @@
 package com.ev_booking_system.api.config;
-import com.ev_booking_system.api.Util.JwtUtil;
-import com.ev_booking_system.api.filter.JwtFilter;
-import com.ev_booking_system.api.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-// import org.springframework.security.config.Customizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.ev_booking_system.api.filter.JwtFilter;
 
 @Configuration
 public class SecurityConfig {
@@ -27,12 +25,12 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/login", "/api/users/register","/api/ev_stations/all").permitAll()
-                        .requestMatchers("/api/auth/check").permitAll()
-                        .anyRequest().authenticated()
+                .requestMatchers("/api/users/login", "/api/users/register", "/api/ev_stations/all", "/api/evs/add", "/api/evs/all").permitAll()
+                .requestMatchers("/api/auth/check").permitAll()
+                .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
