@@ -5,22 +5,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.ev_booking_system.api.model.EvModel;
 import com.ev_booking_system.api.repository.EvRepository;
+import com.ev_booking_system.api.service.EvService;
 
 @RestController
 @RequestMapping("/api/evs")
 public class EvController {
 
     @Autowired
+    private EvService evService;
+
+    @Autowired
     private EvRepository evRepository;
 
-    // Add a new EV
     @PostMapping("/add")
     public ResponseEntity<EvModel> addEv(@RequestBody EvModel ev) {
-        EvModel savedEv = evRepository.save(ev);
-        return ResponseEntity.ok(savedEv);
+        evService.addEv(ev);
+        return ResponseEntity.ok(ev);
     }
 
-    // Optional: List all EVs
     @GetMapping("/all")
     public ResponseEntity<?> getAllEvs() {
         return ResponseEntity.ok(evRepository.findAll());

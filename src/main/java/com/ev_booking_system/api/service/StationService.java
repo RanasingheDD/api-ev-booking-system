@@ -18,4 +18,5 @@ public class StationService {
     public Optional<StationModel> getStationById(String id) {
         return stationRepository.findById(id);
     }
+    
 }
