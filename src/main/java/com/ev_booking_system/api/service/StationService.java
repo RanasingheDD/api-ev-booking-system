@@ -1,5 +1,6 @@
 package com.ev_booking_system.api.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,15 @@ public class StationService {
     private StationRepository stationRepository;
 
     // Other service methods...
-    public Optional<StationModel> getStationById(String id) {
-        return stationRepository.findById(id);
+    public StationModel getStationById(String id) {
+        return stationRepository.findById(id).orElseThrow(()-> new RuntimeException("Station not found"));
+    }
+
+    public StationModel addStation(StationModel station) {
+        return stationRepository.save(station);
+    }
+
+    public List<StationModel> getAll(){
+        return stationRepository.findAll();
     }
 }

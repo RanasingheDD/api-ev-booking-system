@@ -23,4 +23,6 @@ public class EvModel {
     private String vin;
     private String nickname;
     private double mileage;
+    private String registrationNo;
+
 }
