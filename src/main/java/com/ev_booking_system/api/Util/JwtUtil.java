@@ -1,15 +1,13 @@
 package com.ev_booking_system.api.Util;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import javax.crypto.SecretKey;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private final String SECRET = "thisIsASecretKeyWithAtLeast32Characters!";
+    private final String SECRET = "9a74c825b71c0a82095bc2bff80cdb468aabbf38b7dccf23ffde7e7b88ddaffc";
     private final long EXPIRATION = 1000 * 60 *60*3 ; // 1 day
 
     public String generateToken(String email) {
@@ -45,6 +43,16 @@ public class JwtUtil {
                 .setSigningKey(Keys.hmacShaKeyFor(SECRET.getBytes()))
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public String extractUserId(String token) {
+        System.out.println("12345");
+        return Jwts.parserBuilder()
+                .setSigningKey(Keys.hmacShaKeyFor(SECRET.getBytes()))
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 
 }
