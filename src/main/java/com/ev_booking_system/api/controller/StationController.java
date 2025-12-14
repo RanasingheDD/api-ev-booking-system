@@ -24,7 +24,7 @@ public class StationController {
     }
 
     // Optional: List all EVs
-    @GetMapping("/all" )
+    @GetMapping("/all")
     public ResponseEntity<?> getAllEvs() {
         return ResponseEntity.ok(stationRepository.findAll());
     }
