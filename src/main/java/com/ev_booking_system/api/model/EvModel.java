@@ -23,6 +23,9 @@ public class EvModel {
     private String vin;
     private String nickname;
     private double mileage;
+<<<<<<< Updated upstream
     private String registrationNo;
+=======
+>>>>>>> Stashed changes
 
 }
