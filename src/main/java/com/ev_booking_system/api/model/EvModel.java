@@ -16,6 +16,8 @@ public class EvModel {
     @Id
     private String id;
 
+    private String registrationNo;
+    
     private String make;
     private String model;
     private int year;
@@ -23,4 +25,6 @@ public class EvModel {
     private String vin;
     private String nickname;
     private double mileage;
+
+    private String userEmail;
 }
