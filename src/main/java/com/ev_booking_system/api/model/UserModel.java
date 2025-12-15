@@ -25,8 +25,8 @@ public class UserModel {
     private Role role; // USER, OWNER, ADMIN
     private List<String> evIds; // references to EV documents
 
-    public void setRole(String user) {
-        this.role = role;
-    }
+//    //public void setRole(String user) {
+//        this.role = role;
+//    }
 
 }

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ev_booking_system.api.model.EvModel;
 import com.ev_booking_system.api.repository.EvRepository;
-
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/evs")
 public class EvController {
