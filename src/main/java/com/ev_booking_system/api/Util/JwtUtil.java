@@ -10,15 +10,14 @@ public class JwtUtil {
     private final String SECRET = "9a74c825b71c0a82095bc2bff80cdb468aabbf38b7dccf23ffde7e7b88ddaffc";
     private final long EXPIRATION = 1000 * 60 *60*3 ; // 1 day
 
-    public String generateToken(String email) {
+    public String generateToken(String userId) {
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(userId)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(Keys.hmacShaKeyFor(SECRET.getBytes()), SignatureAlgorithm.HS256)
                 .compact();
     }
-
 
     public String extractEmail(String token) {
         return parseClaims(token).getSubject();
@@ -46,7 +45,6 @@ public class JwtUtil {
     }
 
     public String extractUserId(String token) {
-        System.out.println("12345");
         return Jwts.parserBuilder()
                 .setSigningKey(Keys.hmacShaKeyFor(SECRET.getBytes()))
                 .build()
