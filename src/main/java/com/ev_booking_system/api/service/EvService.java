@@ -6,13 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ev_booking_system.api.Util.JwtUtil;
-import com.ev_booking_system.api.dto.EvDto;
 
 import com.ev_booking_system.api.model.EvModel;
 import com.ev_booking_system.api.repository.EvRepository;
 
 @Service
-public class EVservice {
+public class EvService {
 
     @Autowired
     private EvRepository evRepository;
@@ -35,7 +34,6 @@ public class EVservice {
             evModel.setUserId(userId);
 
         } catch (Exception e) {
-            e.printStackTrace(); // print exception for debugging
             return null; // or you can throw a custom exception
         }
 
