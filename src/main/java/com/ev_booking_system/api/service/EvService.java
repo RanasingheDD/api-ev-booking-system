@@ -12,7 +12,7 @@ import com.ev_booking_system.api.model.EvModel;
 import com.ev_booking_system.api.repository.EvRepository;
 
 @Service
-public class EvService {
+public class EVservice {
 
     @Autowired
     private EvRepository evRepository;
@@ -20,7 +20,7 @@ public class EvService {
     @Autowired
     private JwtUtil jwtUtil;
 
-        public EvModel addEV(EvModel evModel, String token) {
+    public EvModel addEV(EvModel evModel, String token) {
         // Check if EV with this ID already exists
         /*if (evRepository.findById(evModel.getId()).isPresent()) {
             throw new RuntimeException("EV with this ID already exists");
@@ -41,7 +41,8 @@ public class EvService {
 
         return evRepository.save(evModel);
     }
-/* 
+
+    /* 
     public EvDto updateEv(EvDto evModel,String id){
         try {
         // Fetch user
@@ -83,8 +84,8 @@ public class EvService {
         throw new RuntimeException("Profile update failed: " + e.getMessage());
         }
     }
-*/
-    public EvModel getEvById(String id){
+     */
+    public EvModel getEvById(String id) {
         return evRepository.findById(id).orElseThrow(() -> new RuntimeException("Booking not found"));
     }
 
@@ -102,7 +103,7 @@ public class EvService {
             return true;
         }
 
-    return false;
-}
+        return false;
+    }
 
 }
