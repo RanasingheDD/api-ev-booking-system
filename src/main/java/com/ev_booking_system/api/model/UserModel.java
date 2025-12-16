@@ -18,7 +18,7 @@ public class UserModel {
     @Id
     private String id;
 
-    private String username;
+    private String name;
     private String email;
     private long mobile;
     private String password;

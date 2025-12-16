@@ -1,20 +1,29 @@
 package com.ev_booking_system.api.controller;
 
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
+import com.ev_booking_system.api.dto.EvDto;
+import com.ev_booking_system.api.dto.LoginRequest;
+import com.ev_booking_system.api.dto.UserDto;
+import com.ev_booking_system.api.model.EvModel;
+import com.ev_booking_system.api.model.UserModel;
+import com.ev_booking_system.api.service.UserService;
+
+import java.util.List;
+import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import com.ev_booking_system.api.dto.EvDto;
+import com.ev_booking_system.api.dto.LoginRequest;
+import com.ev_booking_system.api.dto.UserDto;
+import com.ev_booking_system.api.model.EvModel;
+import com.ev_booking_system.api.model.UserModel;
+import com.ev_booking_system.api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.ev_booking_system.api.dto.LoginRequest;
 import com.ev_booking_system.api.dto.UserDto;
@@ -25,6 +34,16 @@ import com.ev_booking_system.api.model.UserModel;
 import com.ev_booking_system.api.repository.UserRepository;
 import com.ev_booking_system.api.service.SessionService;
 import com.ev_booking_system.api.service.UserService;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/users")
@@ -74,9 +93,9 @@ public class UserController {
 
     }
 
-    @PostMapping("/addEv")
-    public EvModel addEV(@RequestBody EvModel evModel) {
-        return userService.addEV(evModel);
+    @PostMapping("/evs")
+    public EvModel addEV(@RequestBody EvModel evModel, @RequestHeader("Authorization") String token) {
+        return userService.addEV(evModel,token);
     }
 
     @PutMapping("/{email}")
@@ -84,35 +103,41 @@ public class UserController {
         return userService.updateUser(email, updatedUser);
     }
 
+    @GetMapping("/evs")
+    public ResponseEntity<?> getUserEv(@RequestHeader("Authorization") String token){
+        List<EvDto> evs =  userService.getUserEv(token);
+        return ResponseEntity.ok(Map.of("evs", evs));
+    }
+  
     @GetMapping("/me")
-    public ResponseEntity<UserProfileDto> getCurrentUser() {
-        UserModel user = userService.getCurrentUser();
+      public ResponseEntity<UserProfileDto> getCurrentUser() {
+          UserModel user = userService.getCurrentUser();
 
-        UserProfileDto dto = new UserProfileDto();
-        dto.setUsername(user.getUsername());
-        dto.setEmail(user.getEmail());
-        dto.setMobile(user.getMobile());
-        dto.setRole(user.getRole());
+          UserProfileDto dto = new UserProfileDto();
+          dto.setUsername(user.getUsername());
+          dto.setEmail(user.getEmail());
+          dto.setMobile(user.getMobile());
+          dto.setRole(user.getRole());
 
-        return ResponseEntity.ok(dto);
-    }
+          return ResponseEntity.ok(dto);
+      }
 
-    @PutMapping("/me")
-    public ResponseEntity<UserProfileDto> updateCurrentUser(@RequestBody UserProfileDto dto) {
+      @PutMapping("/me")
+      public ResponseEntity<UserProfileDto> updateCurrentUser(@RequestBody UserProfileDto dto) {
 
-        UserModel user = userService.getCurrentUser();
-        user.setUsername(dto.getUsername());
-        user.setMobile(dto.getMobile());
+          UserModel user = userService.getCurrentUser();
+          user.setUsername(dto.getUsername());
+          user.setMobile(dto.getMobile());
 
-        userRepository.save(user);
+          userRepository.save(user);
 
-        return ResponseEntity.ok(dto);
-    }
+          return ResponseEntity.ok(dto);
+      }
 
-    @DeleteMapping("/me")
-    public ResponseEntity<?> deleteAccount(Authentication auth) {
-        userService.deleteUser(auth.getName()); // deletes user + invalidates sessions
-        return ResponseEntity.ok("Account deleted successfully");
-    }
+      @DeleteMapping("/me")
+      public ResponseEntity<?> deleteAccount(Authentication auth) {
+          userService.deleteUser(auth.getName()); // deletes user + invalidates sessions
+          return ResponseEntity.ok("Account deleted successfully");
+      }
 
 }

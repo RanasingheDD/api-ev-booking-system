@@ -15,7 +15,7 @@ public class UserDto {
 
     private String token;
     private String id;
-    private String username;
+    private String name;
     private String email;
     private Role role; // USER, OWNER, ADMIN
     private List<String> evIds; // references to EV documents
