@@ -27,4 +27,6 @@ public class EvModel {
   private String licensePlate;
   private String nickname;
   private LocalDateTime createdAt;
+  private double mileage;
+  private String userEmail;
 }
