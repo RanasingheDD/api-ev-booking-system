@@ -7,11 +7,9 @@ import org.springframework.stereotype.Repository;
 
 import com.ev_booking_system.api.model.EvModel;
 
+
 @Repository
 public interface EvRepository extends MongoRepository<EvModel, String> {
     List<EvModel> findByUserId(String userId);
-    EvModel findByRegistrationNo(String registrationNo);
-
-    List<EvModel> findByUserEmail(String userEmail);
     //EvDto findById(String id);
 }

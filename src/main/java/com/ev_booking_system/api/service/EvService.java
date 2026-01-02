@@ -20,7 +20,7 @@ public class EvService {
     @Autowired
     private JwtUtil jwtUtil;
 
-        public EvModel addEV(EvModel evModel, String token) {
+    public EvModel addEv(EvModel evModel, String token) {
         // Check if EV with this ID already exists
         /*if (evRepository.findById(evModel.getId()).isPresent()) {
             throw new RuntimeException("EV with this ID already exists");
@@ -41,49 +41,49 @@ public class EvService {
 
         return evRepository.save(evModel);
     }
-/* 
-    public EvDto updateEv(EvDto evModel,String id){
-        try {
-        // Fetch user
-        EvModel eModel = evRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    /*
+        public EvDto updateEv(EvDto evModel,String id){
+            try {
+            // Fetch user
+            EvModel eModel = evRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Apply updates
-        if (eModel.getMake() != null && !eModel.getMake().isEmpty()) {
-            eModel.setMake(evModel.getMake());
-        }
-            eModel.setYear(evModel.getYear());
+            // Apply updates
+            if (eModel.getMake() != null && !eModel.getMake().isEmpty()) {
+                eModel.setMake(evModel.getMake());
+            }
+                eModel.setYear(evModel.getYear());
 
-            eModel.setBatteryKwh(evModel.getBatteryKwh());
+                eModel.setBatteryKwh(evModel.getBatteryKwh());
 
-        if (eModel.getModel() != null && !eModel.getModel().isEmpty()) {
-            eModel.setModel(evModel.getModel());
-        }
-            eModel.setMaxChargeKw(evModel.getMaxChargeKw());
+            if (eModel.getModel() != null && !eModel.getModel().isEmpty()) {
+                eModel.setModel(evModel.getModel());
+            }
+                eModel.setMaxChargeKw(evModel.getMaxChargeKw());
 
-        if (eModel.getConnectorTypes() != null && !eModel.getConnectorTypes().isEmpty()) {
-            eModel.setConnectorTypes(evModel.getConnectorTypes());
-        }
-        if (eModel.getVin() != null && !eModel.getVin().isEmpty()) {
-            eModel.setVin(evModel.getVin());
-        }
-        if (eModel.getLicensePlate() != null && !eModel.getLicensePlate().isEmpty()) {
-            eModel.setLicensePlate(evModel.getLicensePlate());
-        }
-        if (eModel.getNickname() != null && !eModel.getNickname().isEmpty()) {
-            eModel.setNickname(evModel.getNickname());
-        }
+            if (eModel.getConnectorTypes() != null && !eModel.getConnectorTypes().isEmpty()) {
+                eModel.setConnectorTypes(evModel.getConnectorTypes());
+            }
+            if (eModel.getVin() != null && !eModel.getVin().isEmpty()) {
+                eModel.setVin(evModel.getVin());
+            }
+            if (eModel.getLicensePlate() != null && !eModel.getLicensePlate().isEmpty()) {
+                eModel.setLicensePlate(evModel.getLicensePlate());
+            }
+            if (eModel.getNickname() != null && !eModel.getNickname().isEmpty()) {
+                eModel.setNickname(evModel.getNickname());
+            }
 
-        // Save user
-        EvModel saved = evRepository.save(eModel);
+            // Save user
+            EvModel saved = evRepository.save(eModel);
 
-        return EvMapper.toDto(saved);
+            return EvMapper.toDto(saved);
 
-    } catch (Exception e) {
-        throw new RuntimeException("Profile update failed: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("Profile update failed: " + e.getMessage());
+            }
         }
-    }
-*/
+    */
     public EvModel getEvById(String id){
         return evRepository.findById(id).orElseThrow(() -> new RuntimeException("Booking not found"));
     }
@@ -102,7 +102,7 @@ public class EvService {
             return true;
         }
 
-    return false;
-}
+        return false;
+    }
 
 }

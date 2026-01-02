@@ -114,7 +114,7 @@ public class UserController {
           UserModel user = userService.getCurrentUser();
 
           UserProfileDto dto = new UserProfileDto();
-          dto.setUsername(user.getUsername());
+          dto.setUsername(user.getName());
           dto.setEmail(user.getEmail());
           dto.setMobile(user.getMobile());
           dto.setRole(user.getRole());
@@ -126,7 +126,7 @@ public class UserController {
       public ResponseEntity<UserProfileDto> updateCurrentUser(@RequestBody UserProfileDto dto) {
 
           UserModel user = userService.getCurrentUser();
-          user.setUsername(dto.getUsername());
+          user.setName(dto.getUsername());
           user.setMobile(dto.getMobile());
 
           userRepository.save(user);
