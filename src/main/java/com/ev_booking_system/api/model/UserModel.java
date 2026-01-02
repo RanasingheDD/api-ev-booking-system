@@ -23,6 +23,7 @@ public class UserModel {
     private String password;
     private String address;
     private Role role; // USER, OWNER, ADMIN
+    private int points;
     private List<String> evIds; // references to EV documents
 
     public void setRole(String user) {

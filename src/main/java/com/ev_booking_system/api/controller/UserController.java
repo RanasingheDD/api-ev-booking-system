@@ -12,11 +12,12 @@ import com.ev_booking_system.api.service.UserService;
 
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 
 import com.ev_booking_system.api.repository.UserRepository;
+
 
 @RestController
 @RequestMapping("/api/users")
@@ -37,11 +38,6 @@ public class UserController {
         user.setRole("USER");
         userRepository.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
-    }
-
-    @GetMapping
-    public List<UserDto> getAllUsers() {
-        return userService.getAllUsers();
     }
 
     @PostMapping("/login")
@@ -69,5 +65,36 @@ public class UserController {
         List<EvDto> evs =  userService.getUserEv(token);
         return ResponseEntity.ok(Map.of("evs", evs));
     }
+  
+    @GetMapping("/me")
+      public ResponseEntity<UserDto> getCurrentUser(@RequestHeader("Authorization") String token) {
+          UserModel user = userService.getCurrentUser(token);
+
+          UserDto dto = new UserDto();
+          dto.setName(user.getName());
+          dto.setEmail(user.getEmail());
+          dto.setMobile(user.getMobile());
+          dto.setRole(user.getRole());
+          return ResponseEntity.ok(dto);
+      }
+
+      @PutMapping("/me")
+      public ResponseEntity<UserDto> updateCurrentUser(@RequestBody UserDto dto ,@RequestHeader("Authorization") String token) {
+
+          UserModel user = userService.getCurrentUser(token);
+          user.setName(dto.getName());
+          user.setMobile(dto.getMobile());
+
+          userRepository.save(user);
+
+          return ResponseEntity.ok(dto);
+      }
+
+      @DeleteMapping("/me")
+      public ResponseEntity<?> deleteAccount(Authentication auth) {
+          ///userService.deleteUser(auth.getName()); // deletes user + invalidates sessions
+          return ResponseEntity.ok("Account deleted successfully");
+      }
+
 
 }

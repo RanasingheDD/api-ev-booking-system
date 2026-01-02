@@ -16,6 +16,8 @@ public class UserDto {
     private String id;
     private String name;
     private String email;
-    private Role role; // USER, OWNER, ADMIN
+    private long mobile;
+    private Role role; 
+    private int points;
     private List<String> evIds; // references to EV documents
 }

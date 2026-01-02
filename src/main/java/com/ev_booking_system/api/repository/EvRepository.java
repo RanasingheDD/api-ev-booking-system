@@ -10,6 +10,6 @@ import com.ev_booking_system.api.model.EvModel;
 
 @Repository
 public interface EvRepository extends MongoRepository<EvModel, String> {
-    List<EvModel> findByUserId(String userId); 
-    //EvDto findById(String id);
+    List<EvModel> findByUserId(String userId);
+    EvModel findBylicensePlate(String licensePlate);
 }
