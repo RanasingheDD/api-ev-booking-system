@@ -2,8 +2,6 @@ package com.ev_booking_system.api.service;
 
 import com.ev_booking_system.api.Util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +39,7 @@ public class UserService {
 
         // Encrypt password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
+        user.setPoints(0);
         return userRepository.save(user);
     }
 
@@ -82,7 +80,7 @@ public class UserService {
         String token = jwtUtil.generateToken(user.getId());
 
         // Return UserDto (safe data)
-        return new UserDto(token,user.getId(), user.getName(), user.getEmail(), user.getRole(),user.getEvIds());
+        return new UserDto(token,user.getId(), user.getName(), user.getEmail(), user.getMobile(),user.getRole(),user.getPoints(),user.getEvIds());
     }
 
     public EvModel addEV(EvModel evModel,String token) {
@@ -96,13 +94,21 @@ public class UserService {
         //return "addeds";
     }
 
-    public UserModel getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-
-        return userRepository.findByEmail(username); // or findByUsername()
+    public UserModel getCurrentUser(String token) {
+        //Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        //String username = auth.getName();
+        try {
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+    
+            String userId = jwtUtil.extractUserId(token);
+            return userRepository.findById(userId).orElse(null);
+        } catch (Exception e) {
+            e.printStackTrace();   // <--- print exception!
+            return null;
+        }
     }
-
     public List<EvDto> getUserEv(String token){
         try {
         if (token != null && token.startsWith("Bearer ")) {

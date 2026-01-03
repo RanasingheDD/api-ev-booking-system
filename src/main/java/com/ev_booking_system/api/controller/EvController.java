@@ -6,13 +6,16 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.ev_booking_system.api.model.EvModel;
 import com.ev_booking_system.api.repository.EvRepository;
 import com.ev_booking_system.api.service.EVService;
 import com.ev_booking_system.api.model.EvModel;
 
+
 @RestController
 @RequestMapping("/api/evs")
-@CrossOrigin(origins = "http://localhost:5173") // React port
+@CrossOrigin(origins = "*")
 public class EvController {
 
     @Autowired

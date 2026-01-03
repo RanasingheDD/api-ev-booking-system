@@ -1,16 +1,17 @@
 package com.ev_booking_system.api.model;
 
-import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Data;
 
 import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-@Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Document(collection = "sessions")
 public class SessionModel {
 
