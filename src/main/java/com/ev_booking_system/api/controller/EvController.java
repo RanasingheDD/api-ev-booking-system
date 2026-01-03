@@ -18,6 +18,9 @@ import com.ev_booking_system.api.repository.EvRepository;
 public class EvController {
 
     @Autowired
+    private EvService evService;
+
+    @Autowired
     private EvRepository evRepository;
 
     // Optional: List all EVs
