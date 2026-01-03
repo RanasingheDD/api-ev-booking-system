@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.ev_booking_system.api.model.EvModel;
 import com.ev_booking_system.api.repository.EvRepository;
-
+import com.ev_booking_system.api.service.EvService;
 
 
 @RestController
