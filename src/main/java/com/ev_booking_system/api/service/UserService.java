@@ -23,6 +23,8 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private EvService evService;
+    @Autowired
     private EvRepository evRepository;
     @Autowired
     private JwtUtil jwtUtil;
@@ -89,9 +91,8 @@ public class UserService {
             token = token.substring(7);
         }
         evModel.setUserId(jwtUtil.extractUserId(token));
-        return evRepository.save(evModel);
+        return evService.addEV(evModel,token);
 
-        //return "addeds";
     }
 
     public UserModel getCurrentUser(String token) {
@@ -126,35 +127,25 @@ public class UserService {
     }
 
     public UserDto updateUser(String email, UserDto updatedUser) {
-        // Find existing user
         UserModel user = userRepository.findByEmail(email);
         if (user == null) {
             throw new RuntimeException("User not found");
         }
 
-        // Update fields
         if (updatedUser.getName() != null) {
             user.setName(updatedUser.getName());
         }
-        // Optionally allow updating email:
-        // if (updatedUser.getEmail() != null) user.setEmail(updatedUser.getEmail());
-
-        // Save updated user
         UserModel savedUser = userRepository.save(user);
 
-        // Convert to UserDto
         UserDto dto = new UserDto();
         dto.setName(savedUser.getName());
-        // add other fields if needed
+
 
         return dto;
     }
 
     public void deleteUser(String email) {
-        // Invalidate all sessions first
         sessionService.invalidateAll(email);
-
-        // Delete the user
         UserModel user = userRepository.findByEmail(email);
         if (user != null) {
             userRepository.delete(user);

@@ -9,7 +9,11 @@ import org.springframework.web.bind.annotation.*;
 
 import com.ev_booking_system.api.model.EvModel;
 import com.ev_booking_system.api.repository.EvRepository;
+<<<<<<< HEAD
 import com.ev_booking_system.api.service.EvService;
+=======
+
+>>>>>>> 814ccf865012c161873a8f82f5ceb6d52b7fc4fb
 
 
 @RestController
@@ -28,5 +32,9 @@ public class EvController {
     public ResponseEntity<List<EvModel>> getAllEvs() {
         return ResponseEntity.ok(evRepository.findAll());
     }
+<<<<<<< HEAD
   
+=======
+>>>>>>> 814ccf865012c161873a8f82f5ceb6d52b7fc4fb
 }
+
