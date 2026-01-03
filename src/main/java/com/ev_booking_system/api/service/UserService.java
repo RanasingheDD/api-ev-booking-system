@@ -29,14 +29,14 @@ public class UserService {
     @Autowired
     private SessionService sessionService;
 
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     public UserModel registerUser(UserModel user) {
         // Check if user already exists
         if (userRepository.findByEmail(user.getEmail()) != null) {
             throw new RuntimeException("Email already registered!");
         }
-
         // Encrypt password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setPoints(0);
