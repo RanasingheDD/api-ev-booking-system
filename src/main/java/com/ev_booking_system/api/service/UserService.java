@@ -2,16 +2,18 @@ package com.ev_booking_system.api.service;
 
 import com.ev_booking_system.api.Util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.ev_booking_system.api.dto.EvDto;
 import com.ev_booking_system.api.dto.UserDto;
+import com.ev_booking_system.api.mapper.EvMapper;
 import com.ev_booking_system.api.model.EvModel;
 import com.ev_booking_system.api.repository.EvRepository;
 import com.ev_booking_system.api.model.UserModel;
 import com.ev_booking_system.api.repository.UserRepository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +26,8 @@ public class UserService {
     private EvRepository evRepository;
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private SessionService sessionService;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -35,7 +39,7 @@ public class UserService {
         }
         // Encrypt password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        System.out.println(user.getPassword());
+        user.setPoints(0);
         return userRepository.save(user);
     }
 
@@ -44,7 +48,7 @@ public class UserService {
                 .map(user -> {
                     UserDto dto = new UserDto();
                     dto.setId(user.getId());
-                    dto.setUsername(user.getUsername());
+                    dto.setName(user.getName());
                     dto.setEmail(user.getEmail());
                     dto.setRole(user.getRole());
                     dto.setEvIds(user.getEvIds());
@@ -61,8 +65,6 @@ public class UserService {
         UserModel user = userRepository.findByEmail(email);
         System.out.println("LOGIN EMAIL = " + email);
 
-
-
         if (user == null) {
             System.out.println("USER = " + user);
             throw new RuntimeException("User not found");
@@ -75,34 +77,52 @@ public class UserService {
             throw new RuntimeException("Invalid password");
         }
 
-        String token = jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(user.getId());
 
         // Return UserDto (safe data)
-        return new UserDto(token,user.getId(), user.getUsername(), user.getEmail(), user.getRole(),user.getEvIds());
+        return new UserDto(token,user.getId(), user.getName(), user.getEmail(), user.getMobile(),user.getRole(),user.getPoints(),user.getEvIds());
     }
 
-    public EvModel addEV(EvModel evModel) {
-        // Optional: check if registrationNo already exists
-        /*if(evRepository.findByRegistrationNo(evModel.getRegistrationNo()) != null){
-            throw new RuntimeException("EV with this registration number already exists");
-        }*/
+    public EvModel addEV(EvModel evModel,String token) {
+
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        evModel.setUserId(jwtUtil.extractUserId(token));
         return evRepository.save(evModel);
 
         //return "addeds";
     }
 
-    public UserModel getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-
-        return userRepository.findByEmail(username); // or findByUsername()
+    public UserModel getCurrentUser(String token) {
+        //Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        //String username = auth.getName();
+        try {
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+    
+            String userId = jwtUtil.extractUserId(token);
+            return userRepository.findById(userId).orElse(null);
+        } catch (Exception e) {
+            e.printStackTrace();   // <--- print exception!
+            return null;
+        }
     }
+    public List<EvDto> getUserEv(String token){
+        try {
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
 
-    public EvModel findEvForCurrentUser() {
-        UserModel user = getCurrentUser();
-        String id = user.getId();
-        return evRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("EV not found for user: " + id));
+        String userId = jwtUtil.extractUserId(token);
+        return evRepository.findByUserId(userId).stream()
+                .map(EvMapper::toDto).collect(Collectors.toList());
+
+    } catch (Exception e) {
+        e.printStackTrace();   // <--- print exception!
+        return Collections.emptyList();
+        }
     }
 
     public UserDto updateUser(String email, UserDto updatedUser) {
@@ -113,8 +133,8 @@ public class UserService {
         }
 
         // Update fields
-        if (updatedUser.getUsername() != null) {
-            user.setUsername(updatedUser.getUsername());
+        if (updatedUser.getName() != null) {
+            user.setName(updatedUser.getName());
         }
         // Optionally allow updating email:
         // if (updatedUser.getEmail() != null) user.setEmail(updatedUser.getEmail());
@@ -124,10 +144,21 @@ public class UserService {
 
         // Convert to UserDto
         UserDto dto = new UserDto();
-        dto.setUsername(savedUser.getUsername());
+        dto.setName(savedUser.getName());
         // add other fields if needed
 
         return dto;
+    }
+
+    public void deleteUser(String email) {
+        // Invalidate all sessions first
+        sessionService.invalidateAll(email);
+
+        // Delete the user
+        UserModel user = userRepository.findByEmail(email);
+        if (user != null) {
+            userRepository.delete(user);
+        }
     }
 
 }

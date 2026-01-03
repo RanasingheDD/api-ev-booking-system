@@ -1,4 +1,7 @@
 package com.ev_booking_system.api.model;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,12 +14,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EvModel {
-    @Id
-    private String id;
-
-    private String model;
-    private String registrationNo;
-    private String batteryCapacity;
-    private String speed;
-    private String ownerId; // Reference to User (the EV owner)
+  @Id  
+  private String id;
+  private String userId;
+  private String make;
+  private String model;
+  private int year;
+  private double batteryKwh;
+  private double maxChargeKw;
+  private List<String> connectorTypes;
+  private String vin;
+  private String licensePlate;
+  private String nickname;
+  private LocalDateTime createdAt;
+  private double mileage;
+  private String userEmail;
 }
