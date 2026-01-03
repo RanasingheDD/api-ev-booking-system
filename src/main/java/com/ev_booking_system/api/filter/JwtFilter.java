@@ -1,5 +1,5 @@
 package com.ev_booking_system.api.filter;
-import com.ev_booking_system.api.service.UserService;
+
 import com.ev_booking_system.api.Util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,8 +20,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+            HttpServletResponse response,
+            FilterChain filterChain)
             throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
@@ -38,8 +38,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
             String email = jwtUtil.extractEmail(token);
 
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(email, null, null);
+            UsernamePasswordAuthenticationToken authentication
+                    = new UsernamePasswordAuthenticationToken(email, null, null);
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

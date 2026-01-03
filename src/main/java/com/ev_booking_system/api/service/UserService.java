@@ -26,6 +26,8 @@ public class UserService {
     private EvRepository evRepository;
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private SessionService sessionService;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -146,6 +148,17 @@ public class UserService {
         // add other fields if needed
 
         return dto;
+    }
+
+    public void deleteUser(String email) {
+        // Invalidate all sessions first
+        sessionService.invalidateAll(email);
+
+        // Delete the user
+        UserModel user = userRepository.findByEmail(email);
+        if (user != null) {
+            userRepository.delete(user);
+        }
     }
 
 }
