@@ -40,7 +40,7 @@ public class StationController {
         return ResponseEntity.ok(stationRepository.findAll());
     }
 
-    @PreAuthorize("hasAuthority('OWNER')")
+
     @GetMapping("/{id}")
     public StationModel getStationById(@PathVariable String id) {
         return stationService.getStationById(id);
