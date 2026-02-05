@@ -36,7 +36,8 @@ public class SecurityConfig {
                                 "/api/ev_stations/add",
                                 "/api/users/evs",
                                 "/api/users/me",
-                                "/api/sessions"
+                                "/api/sessions",
+                                "/api/bookings"
                         ).permitAll()
                         .requestMatchers("/api/auth/check").permitAll()
                         .anyRequest().authenticated()
