@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.ev_booking_system.api.model.StationModel;
@@ -26,23 +27,26 @@ public class StationController {
     private StationService stationService;
 
     // Add a new EV
+    @PreAuthorize("hasAuthority('OWNER')")
     @PostMapping("/add")
     public ResponseEntity<StationModel> addStation(@RequestBody StationModel stationModel) {
         StationModel savedEv = stationRepository.save(stationModel);
         return ResponseEntity.ok(savedEv);
     }
 
-    // Optional: List all EVs
+
     @GetMapping("/all")
     public ResponseEntity<?> getAllEvs() {
         return ResponseEntity.ok(stationRepository.findAll());
     }
 
+    @PreAuthorize("hasAuthority('OWNER')")
     @GetMapping("/{id}")
     public StationModel getStationById(@PathVariable String id) {
         return stationService.getStationById(id);
     }
 
+    @PreAuthorize("hasAuthority('OWNER')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateStation(
             @PathVariable String id,
@@ -80,6 +84,7 @@ public class StationController {
     /**
      * Delete station (NEW ENDPOINT)
      */
+    @PreAuthorize("hasAuthority('OWNER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteStation(
             @PathVariable String id,
@@ -118,6 +123,7 @@ public class StationController {
     /**
      * Get stations by owner/operator (NEW ENDPOINT)
      */
+    @PreAuthorize("hasAuthority('OWNER')")
     @GetMapping("/owner/{operatorId}")
     public ResponseEntity<?> getStationsByOwner(@PathVariable String operatorId) {
         try {
@@ -128,7 +134,6 @@ public class StationController {
                     .body(Map.of("error", "Failed to fetch stations: " + e.getMessage()));
         }
     }
-
 
     @GetMapping("/search")
     public ResponseEntity<?> searchStations(@RequestParam("q") String query) {

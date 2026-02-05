@@ -4,6 +4,7 @@ import com.ev_booking_system.api.model.UserModel; // Import your UserModel
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.util.Date;
 import java.util.HashMap;

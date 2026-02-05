@@ -96,36 +96,13 @@ public class UserController {
         return ResponseEntity.ok(Map.of("evs", evs));
     }
 
-    @GetMapping("/profile")
-    public ResponseEntity<UserDto> getUserProfile(Authentication authentication) {
-        // 1. Get the email from the authenticated token
-        String email = authentication.getName();
 
-        // 2. Find the user directly from the database using the repository
-        // Note: Assuming your repository returns UserModel (or check if it returns Optional)
-        UserModel user = userRepository.findByEmail(email);
-
-        if (user != null) {
-            UserDto dto = new UserDto();
-            // 3. Fill in the data the Frontend needs
-            dto.setId(user.getId());          // <--- This fixes the "Create Station" bug
-            dto.setName(user.getName());
-            dto.setEmail(user.getEmail());
-            dto.setRole(user.getRole());
-            dto.setMobile(user.getMobile());
-
-            return ResponseEntity.ok(dto);
-        }
-
-        // 4. If user not found
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-  
     @GetMapping("/me")
       public ResponseEntity<UserDto> getCurrentUser(@RequestHeader("Authorization") String token) {
           UserModel user = userService.getCurrentUser(token);
 
           UserDto dto = new UserDto();
+          dto.setId(user.getId());
           dto.setName(user.getName());
           dto.setEmail(user.getEmail());
           dto.setMobile(user.getMobile());
@@ -150,6 +127,5 @@ public class UserController {
           ///userService.deleteUser(auth.getName()); // deletes user + invalidates sessions
           return ResponseEntity.ok("Account deleted successfully");
       }
-
 
 }
