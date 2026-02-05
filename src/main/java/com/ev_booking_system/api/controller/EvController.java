@@ -1,34 +1,32 @@
 package com.ev_booking_system.api.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.ev_booking_system.api.model.EvModel;
 import com.ev_booking_system.api.repository.EvRepository;
+import com.ev_booking_system.api.service.EvService;
+
+
 
 @RestController
 @RequestMapping("/api/evs")
+@CrossOrigin(origins = "*")
 public class EvController {
+
+    @Autowired
+    private EvService evService;
 
     @Autowired
     private EvRepository evRepository;
 
-    // Add a new EV
-    @PostMapping("/add")
-    public ResponseEntity<EvModel> addEv(@RequestBody EvModel ev) {
-        EvModel savedEv = evRepository.save(ev);
-        return ResponseEntity.ok(savedEv);
-    }
-
     // Optional: List all EVs
     @GetMapping("/all")
-    public ResponseEntity<?> getAllEvs() {
+    public ResponseEntity<List<EvModel>> getAllEvs() {
         return ResponseEntity.ok(evRepository.findAll());
     }
 }
+

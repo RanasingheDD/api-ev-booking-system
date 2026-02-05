@@ -1,6 +1,7 @@
 package com.ev_booking_system.api.model;
 
 import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -17,15 +18,15 @@ public class UserModel {
     @Id
     private String id;
 
-    private String username;
+    private String name;
     private String email;
     private long mobile;
     private String password;
-    private String address;
     private Role role; // USER, OWNER, ADMIN
+    private int points;
     private List<String> evIds; // references to EV documents
 
-    public void setRole(String user) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
