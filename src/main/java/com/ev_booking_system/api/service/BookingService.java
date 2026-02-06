@@ -77,6 +77,7 @@ public class BookingService {
         }
 
         String id = jwtUtil.extractUserId(token);
+        getQuote(booking.getChargerId(), booking.getStationId(), booking.getStartAt(), booking.getEndAt());
         double hours = (booking.getEndAt().getEpochSecond() - booking.getStartAt().getEpochSecond()) / 3600.0;
 
         double rate = 120;

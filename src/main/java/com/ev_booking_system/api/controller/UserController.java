@@ -1,30 +1,11 @@
 package com.ev_booking_system.api.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import com.ev_booking_system.api.dto.EvDto;
-import com.ev_booking_system.api.dto.LoginRequest;
-import com.ev_booking_system.api.dto.UserDto;
-import com.ev_booking_system.api.model.EvModel;
-import com.ev_booking_system.api.model.UserModel;
-import com.ev_booking_system.api.service.UserService;
-
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-
-import com.ev_booking_system.api.dto.LoginRequest;
-import com.ev_booking_system.api.dto.UserDto;
-import com.ev_booking_system.api.dto.UserProfileDto;
-import com.ev_booking_system.api.model.EvModel;
-import com.ev_booking_system.api.model.Role;
-import com.ev_booking_system.api.model.UserModel;
-import com.ev_booking_system.api.repository.UserRepository;
-import com.ev_booking_system.api.service.SessionService;
-import com.ev_booking_system.api.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,9 +14,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ev_booking_system.api.dto.EvDto;
+import com.ev_booking_system.api.dto.LoginRequest;
+import com.ev_booking_system.api.dto.UserDto;
+import com.ev_booking_system.api.model.EvModel;
+import com.ev_booking_system.api.model.Role;
+import com.ev_booking_system.api.model.UserModel;
+import com.ev_booking_system.api.repository.UserRepository;
+import com.ev_booking_system.api.service.SessionService;
+import com.ev_booking_system.api.service.UserService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/users")
@@ -61,28 +54,51 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
     }
 
+    // @PostMapping("/login")
+    // public ResponseEntity<UserDto> loginUser(@RequestBody LoginRequest loginRequest) {
+    //     UserDto user = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
+    //     if (user != null) {
+    //         // Save session
+    //         sessionService.createSession(
+    //                 user.getEmail(), // username
+    //                 loginRequest.getDevice(), // device name from frontend
+    //                 loginRequest.getOs(), // OS info from frontend
+    //                 loginRequest.getIp(), // IP from request
+    //                 user.getToken()
+    //         );
+    //         return ResponseEntity.ok(user);
+    //     } else {
+    //         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    //     }
+    // }
     @PostMapping("/login")
-    public ResponseEntity<UserDto> loginUser(@RequestBody LoginRequest loginRequest) {
-        UserDto user = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
+    public ResponseEntity<UserDto> loginUser(
+            @RequestBody LoginRequest loginRequest,
+            HttpServletRequest request) {
+
+        UserDto user = userService.loginUser(
+                loginRequest.getEmail(),
+                loginRequest.getPassword()
+        );
+
         if (user != null) {
-            // Save session
             sessionService.createSession(
-                    user.getEmail(), // username
+                    user.getEmail(),
                     loginRequest.getDevice(), // device name from frontend
                     loginRequest.getOs(), // OS info from frontend
-                    loginRequest.getIp(), // IP from request
+                    request.getRemoteAddr(), // IP from request
                     user.getToken()
             );
+
             return ResponseEntity.ok(user);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
     }
 
     @PostMapping("/evs")
     public EvModel addEV(@RequestBody EvModel evModel, @RequestHeader("Authorization") String token) {
-        return userService.addEV(evModel,token);
+        return userService.addEV(evModel, token);
     }
 
     @PutMapping("/{email}")
@@ -91,40 +107,78 @@ public class UserController {
     }
 
     @GetMapping("/evs")
-    public ResponseEntity<?> getUserEv(@RequestHeader("Authorization") String token){
-        List<EvDto> evs =  userService.getUserEv(token);
+    public ResponseEntity<?> getUserEv(@RequestHeader("Authorization") String token) {
+        List<EvDto> evs = userService.getUserEv(token);
         return ResponseEntity.ok(Map.of("evs", evs));
     }
-  
+
     @GetMapping("/me")
-      public ResponseEntity<UserDto> getCurrentUser(@RequestHeader("Authorization") String token) {
-          UserModel user = userService.getCurrentUser(token);
+    public ResponseEntity<UserDto> getCurrentUser(@RequestHeader("Authorization") String token) {
+        UserModel user = userService.getCurrentUser(token);
 
-          UserDto dto = new UserDto();
-          dto.setName(user.getName());
-          dto.setEmail(user.getEmail());
-          dto.setMobile(user.getMobile());
-          dto.setRole(user.getRole());
-          return ResponseEntity.ok(dto);
-      }
+        UserDto dto = new UserDto();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setMobile(user.getMobile());
+        dto.setRole(user.getRole());
+        return ResponseEntity.ok(dto);
+    }
 
-      @PutMapping("/me")
-      public ResponseEntity<UserDto> updateCurrentUser(@RequestBody UserDto dto ,@RequestHeader("Authorization") String token) {
+    @PutMapping("/me")
+    public ResponseEntity<UserDto> updateCurrentUser(@RequestBody UserDto dto, @RequestHeader("Authorization") String token) {
 
-          UserModel user = userService.getCurrentUser(token);
-          user.setName(dto.getName());
-          user.setMobile(dto.getMobile());
+        UserModel user = userService.getCurrentUser(token);
+        user.setName(dto.getName());
+        user.setMobile(dto.getMobile());
 
-          userRepository.save(user);
+        userRepository.save(user);
 
-          return ResponseEntity.ok(dto);
-      }
+        return ResponseEntity.ok(dto);
+    }
 
-      @DeleteMapping("/me")
-      public ResponseEntity<?> deleteAccount(Authentication auth) {
-          ///userService.deleteUser(auth.getName()); // deletes user + invalidates sessions
+    @DeleteMapping("/me")
+    public ResponseEntity<?> deleteAccount(Authentication auth) {
+        ///userService.deleteUser(auth.getName()); // deletes user + invalidates sessions
           return ResponseEntity.ok("Account deleted successfully");
-      }
+    }
 
+    // Helper methods to parse device and OS from User-Agent
+    private String parseDevice(String userAgent) {
+        if (userAgent == null) {
+            return "Unknown Device";
+        }
+
+        if (userAgent.contains("Mobile")) {
+            return "Mobile";
+        }
+        if (userAgent.contains("Windows")) {
+            return "PC";
+        }
+        if (userAgent.contains("Mac")) {
+            return "Mac";
+        }
+        return "Unknown Device";
+    }
+
+    private String parseOS(String userAgent) {
+        if (userAgent == null) {
+            return "Unknown OS";
+        }
+
+        if (userAgent.contains("Windows")) {
+            return "Windows";
+        }
+        if (userAgent.contains("Linux")) {
+            return "Linux";
+        }
+        if (userAgent.contains("Android")) {
+            return "Android";
+        }
+        if (userAgent.contains("Mac OS")) {
+            return "MacOS";
+        }
+        return "Unknown OS";
+    }
 
 }
