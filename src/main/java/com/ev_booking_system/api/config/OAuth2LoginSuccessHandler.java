@@ -25,15 +25,25 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private UserRepository userRepository;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+            Authentication authentication) throws IOException, ServletException {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String email = oAuth2User.getAttribute("email");
+        System.out.println("OAuth2 Login Success for email: " + email);
+
         UserModel user = userRepository.findByEmail(email);
 
+        if (user == null) {
+            System.err.println("User not found in DB after OAuth success! Email: " + email);
+            // handle error, maybe redirect to error page
+            response.sendRedirect("http://localhost:5173/login?error=user_not_found");
+            return;
+        }
+
         String token = jwtUtil.generateToken(user);
-        
+
         // Change this URL to your frontend's redirect URL
-        String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/oauth2/redirect")
+        String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:5173/oauth2/redirect")
                 .queryParam("token", token)
                 .build().toUriString();
 

@@ -10,7 +10,6 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
@@ -27,6 +26,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         try {
             return processOAuth2User(userRequest, oAuth2User);
         } catch (Exception ex) {
+            ex.printStackTrace(); // Log the error!
             throw new OAuth2AuthenticationException(ex.getMessage());
         }
     }
@@ -38,16 +38,19 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         UserModel user = userRepository.findByEmail(email);
+
         if (user != null) {
+            System.out.println("Processing existing user: " + email);
             if (!AuthProvider.GOOGLE.equals(user.getAuthProvider())) {
-               // You might want to update the provider or handle account linking here.
-               // For simplicity, we'll just update the provider key.
-                 user.setAuthProvider(AuthProvider.GOOGLE);
-                 user.setProviderId(oAuth2User.getAttribute("sub"));
-                 userRepository.save(user);
+                // You might want to update the provider or handle account linking here.
+                // For simplicity, we'll just update the provider key.
+                user.setAuthProvider(AuthProvider.GOOGLE);
+                user.setProviderId(oAuth2User.getAttribute("sub"));
+                userRepository.save(user);
             }
-             user = updateExistingUser(user, oAuth2User);
+            user = updateExistingUser(user, oAuth2User);
         } else {
+            System.out.println("Registering new user: " + email);
             user = registerNewUser(oAuth2UserRequest, oAuth2User);
         }
 
@@ -61,11 +64,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         user.setName(oAuth2User.getAttribute("name"));
         user.setEmail(oAuth2User.getAttribute("email"));
         user.setRole(Role.USER);
-        return userRepository.save(user);
+        UserModel savedUser = userRepository.save(user);
+        System.out.println("User saved successfully. ID: " + savedUser.getId() + ", Email: " + savedUser.getEmail());
+        return savedUser;
     }
 
     private UserModel updateExistingUser(UserModel existingUser, OAuth2User oAuth2User) {
         existingUser.setName(oAuth2User.getAttribute("name"));
-        return userRepository.save(existingUser);
+        UserModel savedUser = userRepository.save(existingUser);
+        System.out.println("User updated successfully. ID: " + savedUser.getId());
+        return savedUser;
     }
 }
