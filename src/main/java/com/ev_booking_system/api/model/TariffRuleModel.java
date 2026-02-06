@@ -1,9 +1,10 @@
 package com.ev_booking_system.api.model;
 
-import jakarta.persistence.*;
+//import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.Id;
 
-@Entity
+//@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,7 +14,7 @@ public class TariffRuleModel {
     @Id
     private String id;
 
-    @Enumerated(EnumType.STRING)
+    //@Enumerated(EnumType.STRING)
     private TariffType type;
 
     private double price;
@@ -25,7 +26,7 @@ public class TariffRuleModel {
     private Double minPowerKw;
     private Double maxPowerKw;
 
-    @Embedded
+    //@Embedded
     private TimeRange peakHours;
 
     private Double peakMultiplier;
@@ -43,7 +44,7 @@ public class TariffRuleModel {
     // ============================================
     // EMBEDDABLE: TimeRange
     // ============================================
-    @Embeddable
+    //@Embeddable
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

@@ -1,5 +1,6 @@
 package com.ev_booking_system.api.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -11,11 +12,12 @@ import com.ev_booking_system.api.repository.SessionRepository;
 @Service
 public class SessionService {
 
-    private final SessionRepository repo;
+    @Autowired
+    private  SessionRepository repo;
 
-    public SessionService(SessionRepository repo) {
+    /*public SessionService(SessionRepository repo) {
         this.repo = repo;
-    }
+    }*/
 
     // Save new login session
     public void createSession(

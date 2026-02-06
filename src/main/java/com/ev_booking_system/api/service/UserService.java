@@ -79,7 +79,7 @@ public class UserService {
             throw new RuntimeException("Invalid password");
         }
 
-        String token = jwtUtil.generateToken(user.getId());
+        String token = jwtUtil.generateToken(user);
 
         // Return UserDto (safe data)
         return new UserDto(token,user.getId(), user.getName(), user.getEmail(), user.getMobile(),user.getRole(),user.getPoints(),user.getEvIds());

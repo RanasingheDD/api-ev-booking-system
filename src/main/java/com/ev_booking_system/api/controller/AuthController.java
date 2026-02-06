@@ -23,11 +23,13 @@ public class AuthController {
             String token = authHeader.substring(7);
 
             if (!jwtUtil.validateToken(token)) {
+                System.out.println("Invalid token");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
+            System.out.println("Error validating token: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
