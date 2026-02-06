@@ -16,7 +16,7 @@ public class WebConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.setAllowedOrigins(List.of(
-            "https://ev-station-booking-4nnflgy1r-ranasinghedds-projects.vercel.app",
+            "https://ev-station-booking.vercel.app",
             "http://localhost:5173"
         )); // specify your frontend origins
         config.setAllowedHeaders(List.of("*"));
