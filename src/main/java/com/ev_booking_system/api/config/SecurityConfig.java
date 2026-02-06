@@ -28,24 +28,26 @@ public class SecurityConfig {
                 .and()
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for APIs
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/users/login",
-                                "/api/users/register",
-                                "/api/ev_stations/all",
-                                "/api/evs/add",
-                                "/api/evs/all",
-                               // "/api/ev_stations/{id}",
-                                //"/api/ev_stations/add",
-                                "/api/users/evs",
-                                "/api/users/me",
-                                "/api/sessions",
-                                "/api/bookings"
-                        ).permitAll()
-                        .requestMatchers("/api/auth/check").permitAll()
-                        .anyRequest().authenticated()
+                .requestMatchers(
+                        "/api/users/login",
+                        "/api/users/register",
+                        "/api/ev_stations/all",
+                        "/api/evs/add",
+                        "/api/evs/all",
+                        "/api/ev_stations/{id}",
+                        "/api/ev_stations/add",
+                        "/api/users/evs",
+                        "/api/users/me",
+                        "/api/sessions",
+                        "/api/bookings",
+                        "/ws/**", // <-- allow WebSocket connections
+                        "/app/**" // <-- for sending messages to server
+                ).permitAll()
+                .requestMatchers("/api/auth/check").permitAll()
+                .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

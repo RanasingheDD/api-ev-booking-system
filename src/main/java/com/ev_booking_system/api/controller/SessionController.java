@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
+
 import com.ev_booking_system.api.model.SessionModel;
 import com.ev_booking_system.api.service.SessionService;
 
@@ -18,10 +20,9 @@ public class SessionController {
         this.service = service;
     }
 
-    // GET active devices
-    @GetMapping
-    public List<SessionModel> getSessions(Authentication auth) {
-        return service.getUserSessions(auth.getName());
+    @GetMapping("/sessions/{username}")
+    public ResponseEntity<List<SessionModel>> getActiveSessions(@PathVariable String username) {
+        return ResponseEntity.ok(service.getActiveSessions(username));
     }
 
     // Logout specific device
