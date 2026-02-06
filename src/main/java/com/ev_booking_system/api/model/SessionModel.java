@@ -1,13 +1,13 @@
 package com.ev_booking_system.api.model;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Data;
-
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
@@ -24,6 +24,6 @@ public class SessionModel {
     private String ip;
     private String token;
     private LocalDateTime lastActive;
+    private boolean active;
 
-    // getters & setters
 }
