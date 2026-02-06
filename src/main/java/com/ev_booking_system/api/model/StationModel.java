@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -48,6 +49,7 @@ public class StationModel {
 
     private List<String> amenities = new ArrayList<>();
 
+    @JsonProperty("isOpen")
     private boolean isOpen;
 
     private Double distance;

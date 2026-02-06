@@ -95,12 +95,14 @@ public class UserController {
         List<EvDto> evs =  userService.getUserEv(token);
         return ResponseEntity.ok(Map.of("evs", evs));
     }
-  
+
+
     @GetMapping("/me")
       public ResponseEntity<UserDto> getCurrentUser(@RequestHeader("Authorization") String token) {
           UserModel user = userService.getCurrentUser(token);
 
           UserDto dto = new UserDto();
+          dto.setId(user.getId());
           dto.setName(user.getName());
           dto.setEmail(user.getEmail());
           dto.setMobile(user.getMobile());
@@ -125,6 +127,5 @@ public class UserController {
           ///userService.deleteUser(auth.getName()); // deletes user + invalidates sessions
           return ResponseEntity.ok("Account deleted successfully");
       }
-
 
 }
