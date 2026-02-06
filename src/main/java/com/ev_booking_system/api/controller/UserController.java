@@ -12,18 +12,9 @@ import com.ev_booking_system.api.service.UserService;
 
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import com.ev_booking_system.api.dto.EvDto;
-import com.ev_booking_system.api.dto.LoginRequest;
-import com.ev_booking_system.api.dto.UserDto;
-import com.ev_booking_system.api.model.EvModel;
-import com.ev_booking_system.api.model.UserModel;
-import com.ev_booking_system.api.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 
 import com.ev_booking_system.api.dto.LoginRequest;
 import com.ev_booking_system.api.dto.UserDto;
@@ -44,6 +35,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 @RequestMapping("/api/users")
@@ -67,11 +59,6 @@ public class UserController {
         userService.registerUser(user);
         userRepository.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
-    }
-
-    @GetMapping
-    public List<UserDto> getAllUsers() {
-        return userService.getAllUsers();
     }
 
     @PostMapping("/login")
@@ -110,23 +97,22 @@ public class UserController {
     }
   
     @GetMapping("/me")
-      public ResponseEntity<UserProfileDto> getCurrentUser() {
-          UserModel user = userService.getCurrentUser();
+      public ResponseEntity<UserDto> getCurrentUser(@RequestHeader("Authorization") String token) {
+          UserModel user = userService.getCurrentUser(token);
 
-          UserProfileDto dto = new UserProfileDto();
-          dto.setUsername(user.getUsername());
+          UserDto dto = new UserDto();
+          dto.setName(user.getName());
           dto.setEmail(user.getEmail());
           dto.setMobile(user.getMobile());
           dto.setRole(user.getRole());
-
           return ResponseEntity.ok(dto);
       }
 
       @PutMapping("/me")
-      public ResponseEntity<UserProfileDto> updateCurrentUser(@RequestBody UserProfileDto dto) {
+      public ResponseEntity<UserDto> updateCurrentUser(@RequestBody UserDto dto ,@RequestHeader("Authorization") String token) {
 
-          UserModel user = userService.getCurrentUser();
-          user.setUsername(dto.getUsername());
+          UserModel user = userService.getCurrentUser(token);
+          user.setName(dto.getName());
           user.setMobile(dto.getMobile());
 
           userRepository.save(user);
@@ -136,8 +122,9 @@ public class UserController {
 
       @DeleteMapping("/me")
       public ResponseEntity<?> deleteAccount(Authentication auth) {
-          userService.deleteUser(auth.getName()); // deletes user + invalidates sessions
+          ///userService.deleteUser(auth.getName()); // deletes user + invalidates sessions
           return ResponseEntity.ok("Account deleted successfully");
       }
+
 
 }

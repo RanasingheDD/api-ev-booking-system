@@ -2,8 +2,6 @@ package com.ev_booking_system.api.service;
 
 import com.ev_booking_system.api.Util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,23 +23,25 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private EvService evService;
+    @Autowired
     private EvRepository evRepository;
     @Autowired
     private JwtUtil jwtUtil;
     @Autowired
     private SessionService sessionService;
 
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     public UserModel registerUser(UserModel user) {
         // Check if user already exists
         if (userRepository.findByEmail(user.getEmail()) != null) {
             throw new RuntimeException("Email already registered!");
         }
-
         // Encrypt password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
+        user.setPoints(0);
         return userRepository.save(user);
     }
 
@@ -82,7 +82,7 @@ public class UserService {
         String token = jwtUtil.generateToken(user.getId());
 
         // Return UserDto (safe data)
-        return new UserDto(token,user.getId(), user.getName(), user.getEmail(), user.getRole(),user.getEvIds());
+        return new UserDto(token,user.getId(), user.getName(), user.getEmail(), user.getMobile(),user.getRole(),user.getPoints(),user.getEvIds());
     }
 
     public EvModel addEV(EvModel evModel,String token) {
@@ -91,18 +91,25 @@ public class UserService {
             token = token.substring(7);
         }
         evModel.setUserId(jwtUtil.extractUserId(token));
-        return evRepository.save(evModel);
+        return evService.addEV(evModel,token);
 
-        //return "addeds";
     }
 
-    public UserModel getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-
-        return userRepository.findByEmail(username); // or findByUsername()
+    public UserModel getCurrentUser(String token) {
+        //Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        //String username = auth.getName();
+        try {
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+    
+            String userId = jwtUtil.extractUserId(token);
+            return userRepository.findById(userId).orElse(null);
+        } catch (Exception e) {
+            e.printStackTrace();   // <--- print exception!
+            return null;
+        }
     }
-
     public List<EvDto> getUserEv(String token){
         try {
         if (token != null && token.startsWith("Bearer ")) {
@@ -120,35 +127,25 @@ public class UserService {
     }
 
     public UserDto updateUser(String email, UserDto updatedUser) {
-        // Find existing user
         UserModel user = userRepository.findByEmail(email);
         if (user == null) {
             throw new RuntimeException("User not found");
         }
 
-        // Update fields
         if (updatedUser.getName() != null) {
             user.setName(updatedUser.getName());
         }
-        // Optionally allow updating email:
-        // if (updatedUser.getEmail() != null) user.setEmail(updatedUser.getEmail());
-
-        // Save updated user
         UserModel savedUser = userRepository.save(user);
 
-        // Convert to UserDto
         UserDto dto = new UserDto();
         dto.setName(savedUser.getName());
-        // add other fields if needed
+
 
         return dto;
     }
 
     public void deleteUser(String email) {
-        // Invalidate all sessions first
         sessionService.invalidateAll(email);
-
-        // Delete the user
         UserModel user = userRepository.findByEmail(email);
         if (user != null) {
             userRepository.delete(user);

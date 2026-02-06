@@ -10,7 +10,7 @@ import com.ev_booking_system.api.model.EvModel;
 import com.ev_booking_system.api.repository.EvRepository;
 
 @Service
-public class EVService {
+public class EvService {
 
     @Autowired
     private EvRepository evRepository;
