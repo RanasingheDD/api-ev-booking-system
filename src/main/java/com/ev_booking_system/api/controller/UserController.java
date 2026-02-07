@@ -181,4 +181,12 @@ public class UserController {
         return "Unknown OS";
     }
 
+    @GetMapping("/me/points")
+    public ResponseEntity<UserDto> getUserPoints(@RequestHeader("Authorization") String token) {
+         UserDto user = userService.getUserPoints(token);
+         System.out.println(user.getPoints());
+        return ResponseEntity.ok(userService.getUserPoints(token));
+    }
+
+
 }

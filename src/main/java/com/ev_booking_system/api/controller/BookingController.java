@@ -30,7 +30,7 @@ public class BookingController {
 
     private final BookingService bookingService;
 
-    @PostMapping("/checkout")
+    @PostMapping("/points")
     public ResponseEntity<Map<String, String>> createCheckoutSession(
             @RequestBody BookingModel bookingRequest,
             @RequestHeader("Authorization") String token) throws StripeException {
