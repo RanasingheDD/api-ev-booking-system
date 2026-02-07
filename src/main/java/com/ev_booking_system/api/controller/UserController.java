@@ -147,41 +147,37 @@ public class UserController {
     }
 
     // Helper methods to parse device and OS from User-Agent
-    private String parseDevice(String userAgent) {
-        if (userAgent == null) {
-            return "Unknown Device";
-        }
-
-        if (userAgent.contains("Mobile")) {
-            return "Mobile";
-        }
-        if (userAgent.contains("Windows")) {
-            return "PC";
-        }
-        if (userAgent.contains("Mac")) {
-            return "Mac";
-        }
-        return "Unknown Device";
-    }
-
-    private String parseOS(String userAgent) {
-        if (userAgent == null) {
-            return "Unknown OS";
-        }
-
-        if (userAgent.contains("Windows")) {
-            return "Windows";
-        }
-        if (userAgent.contains("Linux")) {
-            return "Linux";
-        }
-        if (userAgent.contains("Android")) {
-            return "Android";
-        }
-        if (userAgent.contains("Mac OS")) {
-            return "MacOS";
-        }
-        return "Unknown OS";
-    }
-
+    // private String parseDevice(String userAgent) {
+    //     if (userAgent == null) {
+    //         return "Unknown Device";
+    //     }
+    //     if (userAgent.contains("Mobile")) {
+    //         return "Mobile";
+    //     }
+    //     if (userAgent.contains("Windows")) {
+    //         return "PC";
+    //     }
+    //     if (userAgent.contains("Mac")) {
+    //         return "Mac";
+    //     }
+    //     return "Unknown Device";
+    // }
+    // private String parseOS(String userAgent) {
+    //     if (userAgent == null) {
+    //         return "Unknown OS";
+    //     }
+    //     if (userAgent.contains("Windows")) {
+    //         return "Windows";
+    //     }
+    //     if (userAgent.contains("Linux")) {
+    //         return "Linux";
+    //     }
+    //     if (userAgent.contains("Android")) {
+    //         return "Android";
+    //     }
+    //     if (userAgent.contains("Mac OS")) {
+    //         return "MacOS";
+    //     }
+    //     return "Unknown OS";
+    // }
 }

@@ -8,12 +8,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.ev_booking_system.api.model.StationModel;
 import com.ev_booking_system.api.repository.StationRepository;
 import com.ev_booking_system.api.service.StationService;
-import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/ev_stations")
@@ -21,7 +29,6 @@ public class StationController {
 
     @Autowired
     private StationRepository stationRepository;
-
 
     @Autowired
     private StationService stationService;
@@ -34,12 +41,10 @@ public class StationController {
         return ResponseEntity.ok(savedEv);
     }
 
-
     @GetMapping("/all")
     public ResponseEntity<?> getAllEvs() {
         return ResponseEntity.ok(stationRepository.findAll());
     }
-
 
     @GetMapping("/{id}")
     public StationModel getStationById(@PathVariable String id) {
@@ -68,7 +73,6 @@ public class StationController {
             //     return ResponseEntity.status(HttpStatus.FORBIDDEN)
             //         .body(Map.of("error", "You don't have permission to update this station"));
             // }
-
             // Update the station
             stationModel.setId(id);
             StationModel updatedStation = stationRepository.save(stationModel);
@@ -105,7 +109,6 @@ public class StationController {
             //     return ResponseEntity.status(HttpStatus.FORBIDDEN)
             //         .body(Map.of("error", "You don't have permission to delete this station"));
             // }
-
             // Delete the station
             stationRepository.deleteById(id);
 
