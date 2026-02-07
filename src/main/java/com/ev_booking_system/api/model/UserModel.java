@@ -25,6 +25,9 @@ public class UserModel {
     private Role role; // USER, OWNER, ADMIN
     private int points;
     private List<String> evIds; // references to EV documents
+    
+    private AuthProvider authProvider;
+    private String providerId;
 
     public void setRole(Role role) {
         this.role = role;
