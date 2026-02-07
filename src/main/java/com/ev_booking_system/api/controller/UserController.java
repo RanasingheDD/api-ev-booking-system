@@ -55,21 +55,23 @@ public class UserController {
     }
 
     // @PostMapping("/login")
-    // public ResponseEntity<UserDto> loginUser(@RequestBody LoginRequest loginRequest) {
-    //     UserDto user = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
-    //     if (user != null) {
-    //         // Save session
-    //         sessionService.createSession(
-    //                 user.getEmail(), // username
-    //                 loginRequest.getDevice(), // device name from frontend
-    //                 loginRequest.getOs(), // OS info from frontend
-    //                 loginRequest.getIp(), // IP from request
-    //                 user.getToken()
-    //         );
-    //         return ResponseEntity.ok(user);
-    //     } else {
-    //         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    //     }
+    // public ResponseEntity<UserDto> loginUser(@RequestBody LoginRequest
+    // loginRequest) {
+    // UserDto user = userService.loginUser(loginRequest.getEmail(),
+    // loginRequest.getPassword());
+    // if (user != null) {
+    // // Save session
+    // sessionService.createSession(
+    // user.getEmail(), // username
+    // loginRequest.getDevice(), // device name from frontend
+    // loginRequest.getOs(), // OS info from frontend
+    // loginRequest.getIp(), // IP from request
+    // user.getToken()
+    // );
+    // return ResponseEntity.ok(user);
+    // } else {
+    // return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    // }
     // }
     @PostMapping("/login")
     public ResponseEntity<UserDto> loginUser(
@@ -78,8 +80,7 @@ public class UserController {
 
         UserDto user = userService.loginUser(
                 loginRequest.getEmail(),
-                loginRequest.getPassword()
-        );
+                loginRequest.getPassword());
 
         if (user != null) {
             sessionService.createSession(
@@ -87,8 +88,7 @@ public class UserController {
                     loginRequest.getDevice(), // device name from frontend
                     loginRequest.getOs(), // OS info from frontend
                     request.getRemoteAddr(), // IP from request
-                    user.getToken()
-            );
+                    user.getToken());
 
             return ResponseEntity.ok(user);
         } else {
@@ -121,12 +121,14 @@ public class UserController {
         dto.setName(user.getName());
         dto.setEmail(user.getEmail());
         dto.setMobile(user.getMobile());
+        dto.setPoints(user.getPoints());
         dto.setRole(user.getRole());
         return ResponseEntity.ok(dto);
     }
 
     @PutMapping("/me")
-    public ResponseEntity<UserDto> updateCurrentUser(@RequestBody UserDto dto, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<UserDto> updateCurrentUser(@RequestBody UserDto dto,
+            @RequestHeader("Authorization") String token) {
 
         UserModel user = userService.getCurrentUser(token);
         user.setName(dto.getName());
@@ -139,8 +141,9 @@ public class UserController {
 
     @DeleteMapping("/me")
     public ResponseEntity<?> deleteAccount(Authentication auth) {
-        ///userService.deleteUser(auth.getName()); // deletes user + invalidates sessions
-          return ResponseEntity.ok("Account deleted successfully");
+        /// userService.deleteUser(auth.getName()); // deletes user + invalidates
+        /// sessions
+        return ResponseEntity.ok("Account deleted successfully");
     }
 
     // Helper methods to parse device and OS from User-Agent
