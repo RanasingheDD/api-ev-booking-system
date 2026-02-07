@@ -12,6 +12,7 @@ import com.ev_booking_system.api.model.ChargerModel;
 import com.ev_booking_system.api.model.StationModel;
 import com.ev_booking_system.api.repository.BookingRepository;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
@@ -152,4 +153,32 @@ public class BookingService {
                         !(b.getEndAt().isBefore(startAt) || b.getStartAt().isAfter(endAt))
         );
     }
+
+    public List<Map<String, Object>> getAvailableSlots(
+            String chargerId,
+            Instant dayStart,
+            Instant dayEnd
+    ) {
+        List<Map<String, Object>> slots = new ArrayList<>();
+        Duration slotDuration = Duration.ofMinutes(30); // 30-min slots
+
+        Instant current = dayStart;
+
+        while (current.isBefore(dayEnd)) {
+            Instant next = current.plus(slotDuration);
+
+            boolean available = checkAvailability(chargerId, current, next);
+
+            Map<String, Object> slot = new HashMap<>();
+            slot.put("start", current);
+            slot.put("end", next);
+            slot.put("available", available);
+
+            slots.add(slot);
+            current = next;
+        }
+
+        return slots;
+    }
+
 }
