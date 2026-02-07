@@ -1,4 +1,5 @@
 package com.ev_booking_system.api.controller;
+
 import com.ev_booking_system.api.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,54 +22,57 @@ import java.util.Map;
 import com.stripe.model.checkout.Session;
 import com.ev_booking_system.api.model.BookingModel;
 
-
 @RestController
 @RequestMapping("/api/bookings")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:5173") // Your Vite Port
 public class BookingController {
 
-    private final BookingService bookingService;
+        private final BookingService bookingService;
+
+        @PostMapping("/checkout")
+        public ResponseEntity<Map<String, String>> createCheckoutSession(
+                        @RequestBody BookingModel bookingRequest,
+                        @RequestHeader("Authorization") String token) throws StripeException {
+
+                // 1. Create the booking in DB (Status: PENDING)
+                // This calculates the cost based on your Service logic
+                BookingModel savedBooking = bookingService.createBooking(bookingRequest, token);
+
+                // 2. Configure Stripe (Use your Secret Key)
+                Stripe.apiKey = "";
+
+                // Convert LKR to Cents/Paras (Stripe uses smallest units)
+                long amountInCents = (long) (savedBooking.getFinalCost() * 100);
+                System.out.println(amountInCents);
 
     @PostMapping("/points")
     public ResponseEntity<Map<String, String>> createCheckoutSession(
             @RequestBody BookingModel bookingRequest,
             @RequestHeader("Authorization") String token) throws StripeException {
 
-        // 1. Create the booking in DB (Status: PENDING)
-        // This calculates the cost based on your Service logic
-        BookingModel savedBooking = bookingService.createBooking(bookingRequest, token);
+                Session session = Session.create(params);
 
+                Map<String, String> response = new HashMap<>();
+                response.put("url", session.getUrl());
+                return ResponseEntity.ok(response);
+        }
 
-        // 2. Configure Stripe (Use your Secret Key)
-        Stripe.apiKey = "sk_test_51SxPYjGTetGONfV6bNNxrIcGMtlRSptJCQrkqPO4xzcGl6yd4wC7Gfzw6S1a6jQoYFLZKemf0ol0JRqVqy5meUHU0028J4RRVD";
+        public ResponseEntity<Map<String, String>> getBookingById(@PathVariable String id) {
+                BookingModel booking = bookingService.getById(id);
+                Map<String, String> response = new HashMap<>();
+                response.put("booking_id", booking.getId());
+                response.put("status", booking.getStatus().toString());
+                return ResponseEntity.ok(response);
+        }
 
-        // Convert LKR to Cents/Paras (Stripe uses smallest units)
-        long amountInCents = (long) (savedBooking.getFinalCost() * 100);
-        System.out.println(amountInCents);
+        @GetMapping("/me")
+        public ResponseEntity<List<BookingModel>> getUserBookings(
+                        @RequestHeader("Authorization") String token) {
 
-        SessionCreateParams params = SessionCreateParams.builder()
-                .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
-                .setMode(SessionCreateParams.Mode.PAYMENT)
-                // Redirect back to React after payment
-                .setSuccessUrl("http://localhost:5173/payment-success?id=" + savedBooking.getId())
-                .setCancelUrl("http://localhost:5173/cancel")
-                .addLineItem(SessionCreateParams.LineItem.builder()
-                        .setQuantity(1L)
-                        .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
-                                .setCurrency("lkr")
-                                .setUnitAmount(amountInCents)
-                                .setProductData(SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                        .setName("EV Charging: " + savedBooking.getStation().getName())
-                                        .setDescription("Slot: " + savedBooking.getStartAt().toString())
-                                        .build())
-                                .build())
-                        .build())
-                // Store Booking ID in Stripe Metadata for tracking
-                .putMetadata("booking_id", savedBooking.getId())
-                .build();
-
-        Session session = Session.create(params);
+                List<BookingModel> bookings = bookingService.getUserBookings(token, null);
+                return ResponseEntity.ok(bookings);
+        }
 
         Map<String, String> response = new HashMap<>();
         response.put("url", session.getUrl());

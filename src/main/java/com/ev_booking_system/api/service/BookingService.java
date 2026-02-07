@@ -24,11 +24,10 @@ public class BookingService {
     private BookingRepository bookingRepo;
 
     @Autowired
-    private StationService stationService; 
+    private StationService stationService;
 
     @Autowired
     private JwtUtil jwtUtil;
-
 
     // Generate booking quote
     public BookingQuoteDto getQuote(String chargerId, String stationId, Instant startAt, Instant endAt) {
@@ -49,8 +48,7 @@ public class BookingService {
 
         // Check if slot already booked
         boolean isBooked = bookingRepo.existsBookingInTimeRange(
-                stationId, chargerId, startAt, endAt
-        );
+                stationId, chargerId, startAt, endAt);
 
         if (isBooked) {
             availability = false;
@@ -87,19 +85,21 @@ public class BookingService {
         booking.setUserId(id);
         booking.setStatus(BookingStatus.PENDING);
         booking.setCreatedAt(Instant.now());
-        booking.setEstimatedCost(estimatedEnergy*rate);
-        booking.setFinalCost(estimatedEnergy*rate);
+        booking.setEstimatedCost(estimatedEnergy * rate);
+        booking.setFinalCost(estimatedEnergy * rate);
 
         StationModel station = stationService.getStationById(booking.getStationId());
-        ChargerModel charger = stationService.getChargerById(booking.getStationId(),booking.getChargerId());
+        ChargerModel charger = stationService.getChargerById(booking.getStationId(), booking.getChargerId());
 
         booking.setStation(station);
         booking.setCharger(charger);
 
-        /*return BookingMapper.toModel(
-                booking,
-                stationDto,
-                )*/
+        /*
+         * return BookingMapper.toModel(
+         * booking,
+         * stationDto,
+         * )
+         */
         return bookingRepo.save(booking);
     }
 
@@ -108,8 +108,8 @@ public class BookingService {
         return bookingRepo.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
     }
-    
-   // Get user bookings
+
+    // Get user bookings
     public List<BookingModel> getUserBookings(String token, String status) {
 
         if (token != null && token.startsWith("Bearer ")) {
@@ -118,20 +118,42 @@ public class BookingService {
 
         String userId = jwtUtil.extractUserId(token);
         System.out.println(userId);
-        if (status != null && !status.isEmpty()) {
 
+        List<BookingModel> bookings;
+        if (status != null && !status.isEmpty()) {
             try {
-                BookingStatus bookingStatus =
-                        BookingStatus.valueOf(status.toUpperCase());
-    
-                return bookingRepo.findByUserIdAndStatus(userId, bookingStatus);
-    
+                BookingStatus bookingStatus = BookingModel.BookingStatus.valueOf(status.toUpperCase());
+                bookings = bookingRepo.findByUserIdAndStatus(userId, bookingStatus);
             } catch (IllegalArgumentException e) {
                 throw new RuntimeException("Invalid booking status: " + status);
             }
+        } else {
+            bookings = bookingRepo.findByUserId(userId);
         }
 
-        return bookingRepo.findByUserId(userId);
+        // Logic to auto-complete elapsed bookings
+        Instant now = Instant.now();
+        List<BookingModel> updatedBookings = new ArrayList<>();
+        boolean changed = false;
+
+        for (BookingModel booking : bookings) {
+            if (booking.getEndAt() != null && booking.getEndAt().isBefore(now)) {
+                if (booking.getStatus() == BookingStatus.PENDING ||
+                        booking.getStatus() == BookingStatus.CONFIRMED ||
+                        booking.getStatus() == BookingStatus.ACTIVE) {
+
+                    booking.setStatus(BookingStatus.COMPLETED);
+                    updatedBookings.add(booking);
+                    changed = true;
+                }
+            }
+        }
+
+        if (changed) {
+            bookingRepo.saveAll(updatedBookings);
+        }
+
+        return bookings;
     }
 
     // Cancel booking
@@ -148,10 +170,8 @@ public class BookingService {
     public boolean checkAvailability(String chargerId, Instant startAt, Instant endAt) {
         List<BookingModel> all = bookingRepo.findAll();
 
-        return all.stream().noneMatch(b ->
-                b.getChargerId().equals(chargerId) &&
-                        !(b.getEndAt().isBefore(startAt) || b.getStartAt().isAfter(endAt))
-        );
+        return all.stream().noneMatch(b -> b.getChargerId().equals(chargerId) &&
+                !(b.getEndAt().isBefore(startAt) || b.getStartAt().isAfter(endAt)));
     }
 
     public List<Map<String, Object>> getAvailableSlots(

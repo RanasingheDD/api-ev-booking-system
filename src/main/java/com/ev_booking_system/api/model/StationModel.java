@@ -13,11 +13,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Document(collection = "ev_stations")
 @AllArgsConstructor
 @Data
 @NoArgsConstructor
-public class StationModel {
+public class StationModel implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     private String id;

@@ -8,12 +8,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.ev_booking_system.api.model.StationModel;
 import com.ev_booking_system.api.repository.StationRepository;
 import com.ev_booking_system.api.service.StationService;
-import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/ev_stations")
@@ -21,7 +29,6 @@ public class StationController {
 
     @Autowired
     private StationRepository stationRepository;
-
 
     @Autowired
     private StationService stationService;
@@ -34,22 +41,19 @@ public class StationController {
         return ResponseEntity.ok(savedEv);
     }
 
-
     @GetMapping("/all")
     public ResponseEntity<?> getAllEvs() {
-        return ResponseEntity.ok(stationRepository.findAll());
+        return ResponseEntity.ok(stationService.getAllStations());
     }
 
-
     @GetMapping("/{id}")
-    public StationModel getStationById(@PathVariable String id) {
+    public StationModel getStationById(@PathVariable("id") String id) {
         return stationService.getStationById(id);
     }
 
-    @PreAuthorize("hasAuthority('OWNER')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateStation(
-            @PathVariable String id,
+            @PathVariable("id") String id,
             @RequestBody StationModel stationModel,
             Authentication auth) {
 
@@ -65,10 +69,9 @@ public class StationController {
             // Optional: Verify ownership
             // String username = auth.getName();
             // if (!existingStation.get().getOperatorId().equals(username)) {
-            //     return ResponseEntity.status(HttpStatus.FORBIDDEN)
-            //         .body(Map.of("error", "You don't have permission to update this station"));
+            // return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            // .body(Map.of("error", "You don't have permission to update this station"));
             // }
-
             // Update the station
             stationModel.setId(id);
             StationModel updatedStation = stationRepository.save(stationModel);
@@ -87,7 +90,7 @@ public class StationController {
     @PreAuthorize("hasAuthority('OWNER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteStation(
-            @PathVariable String id,
+            @PathVariable("id") String id,
             Authentication auth) {
 
         try {
@@ -102,17 +105,15 @@ public class StationController {
             // Optional: Verify ownership
             // String username = auth.getName();
             // if (!existingStation.get().getOperatorId().equals(username)) {
-            //     return ResponseEntity.status(HttpStatus.FORBIDDEN)
-            //         .body(Map.of("error", "You don't have permission to delete this station"));
+            // return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            // .body(Map.of("error", "You don't have permission to delete this station"));
             // }
-
             // Delete the station
             stationRepository.deleteById(id);
 
             return ResponseEntity.ok(Map.of(
                     "message", "Station deleted successfully",
-                    "id", id
-            ));
+                    "id", id));
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -125,7 +126,7 @@ public class StationController {
      */
     @PreAuthorize("hasAuthority('OWNER')")
     @GetMapping("/owner/{operatorId}")
-    public ResponseEntity<?> getStationsByOwner(@PathVariable String operatorId) {
+    public ResponseEntity<?> getStationsByOwner(@PathVariable("operatorId") String operatorId) {
         try {
             List<StationModel> stations = stationRepository.findByOperatorId(operatorId);
             return ResponseEntity.ok(stations);
