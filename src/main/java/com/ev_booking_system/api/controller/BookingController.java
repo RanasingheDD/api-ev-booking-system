@@ -2,6 +2,7 @@ package com.ev_booking_system.api.controller;
 
 import com.ev_booking_system.api.service.BookingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,10 @@ import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.param.checkout.SessionCreateParams;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,30 +46,10 @@ public class BookingController {
                 long amountInCents = (long) (savedBooking.getFinalCost() * 100);
                 System.out.println(amountInCents);
 
-                SessionCreateParams params = SessionCreateParams.builder()
-                                .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
-                                .setMode(SessionCreateParams.Mode.PAYMENT)
-                                // Redirect back to React after payment
-                                .setSuccessUrl("http://localhost:5173/payment-success?id=" + savedBooking.getId())
-                                .setCancelUrl("http://localhost:5173/booking-page")
-                                .addLineItem(SessionCreateParams.LineItem.builder()
-                                                .setQuantity(1L)
-                                                .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
-                                                                .setCurrency("lkr")
-                                                                .setUnitAmount(amountInCents)
-                                                                .setProductData(SessionCreateParams.LineItem.PriceData.ProductData
-                                                                                .builder()
-                                                                                .setName("EV Charging: " + savedBooking
-                                                                                                .getStation().getName())
-                                                                                .setDescription("Slot: " + savedBooking
-                                                                                                .getStartAt()
-                                                                                                .toString())
-                                                                                .build())
-                                                                .build())
-                                                .build())
-                                // Store Booking ID in Stripe Metadata for tracking
-                                .putMetadata("booking_id", savedBooking.getId())
-                                .build();
+    @PostMapping("/points")
+    public ResponseEntity<Map<String, String>> createCheckoutSession(
+            @RequestBody BookingModel bookingRequest,
+            @RequestHeader("Authorization") String token) throws StripeException {
 
                 Session session = Session.create(params);
 
@@ -88,5 +73,25 @@ public class BookingController {
                 List<BookingModel> bookings = bookingService.getUserBookings(token, null);
                 return ResponseEntity.ok(bookings);
         }
+
+        Map<String, String> response = new HashMap<>();
+        response.put("url", session.getUrl());
+        return ResponseEntity.ok(response);
+    }
+
+
+
+    @GetMapping("/available-slots")
+    public ResponseEntity<List<Map<String, Object>>> getAvailableSlots(
+            @RequestParam String chargerId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
+        Instant dayStart = date.atStartOfDay(ZoneOffset.UTC).toInstant();
+        Instant dayEnd = date.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+
+        return ResponseEntity.ok(
+                bookingService.getAvailableSlots(chargerId, dayStart, dayEnd)
+        );
+    }
 
 }

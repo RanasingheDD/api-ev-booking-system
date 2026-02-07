@@ -159,4 +159,27 @@ public class UserService {
         }
     }
 
+//    Update user points
+    public UserDto getUserPoints(String token) {
+        try {
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+
+            String userId = jwtUtil.extractUserId(token);
+        UserModel user = userRepository.findById(userId).orElseThrow(null);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        UserDto dto = new UserDto();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setPoints(user.getPoints());
+        return dto;
+    }catch (Exception e) {
+        return null;}
+    }
+
 }
