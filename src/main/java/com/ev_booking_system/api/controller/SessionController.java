@@ -27,7 +27,7 @@ public class SessionController {
 
     // Logout specific device
     @DeleteMapping("/{id}")
-    public void logoutDevice(@PathVariable String id) {
+    public void logoutDevice(@PathVariable("id") String id) {
         service.logoutSession(id);
     }
 
