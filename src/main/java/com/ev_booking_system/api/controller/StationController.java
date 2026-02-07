@@ -22,7 +22,6 @@ public class StationController {
     @Autowired
     private StationRepository stationRepository;
 
-
     @Autowired
     private StationService stationService;
 
@@ -34,22 +33,19 @@ public class StationController {
         return ResponseEntity.ok(savedEv);
     }
 
-
     @GetMapping("/all")
     public ResponseEntity<?> getAllEvs() {
-        return ResponseEntity.ok(stationRepository.findAll());
+        return ResponseEntity.ok(stationService.getAllStations());
     }
 
-
     @GetMapping("/{id}")
-    public StationModel getStationById(@PathVariable String id) {
+    public StationModel getStationById(@PathVariable("id") String id) {
         return stationService.getStationById(id);
     }
 
-    @PreAuthorize("hasAuthority('OWNER')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateStation(
-            @PathVariable String id,
+            @PathVariable("id") String id,
             @RequestBody StationModel stationModel,
             Authentication auth) {
 
@@ -65,8 +61,8 @@ public class StationController {
             // Optional: Verify ownership
             // String username = auth.getName();
             // if (!existingStation.get().getOperatorId().equals(username)) {
-            //     return ResponseEntity.status(HttpStatus.FORBIDDEN)
-            //         .body(Map.of("error", "You don't have permission to update this station"));
+            // return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            // .body(Map.of("error", "You don't have permission to update this station"));
             // }
 
             // Update the station
@@ -87,7 +83,7 @@ public class StationController {
     @PreAuthorize("hasAuthority('OWNER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteStation(
-            @PathVariable String id,
+            @PathVariable("id") String id,
             Authentication auth) {
 
         try {
@@ -102,8 +98,8 @@ public class StationController {
             // Optional: Verify ownership
             // String username = auth.getName();
             // if (!existingStation.get().getOperatorId().equals(username)) {
-            //     return ResponseEntity.status(HttpStatus.FORBIDDEN)
-            //         .body(Map.of("error", "You don't have permission to delete this station"));
+            // return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            // .body(Map.of("error", "You don't have permission to delete this station"));
             // }
 
             // Delete the station
@@ -111,8 +107,7 @@ public class StationController {
 
             return ResponseEntity.ok(Map.of(
                     "message", "Station deleted successfully",
-                    "id", id
-            ));
+                    "id", id));
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -125,7 +120,7 @@ public class StationController {
      */
     @PreAuthorize("hasAuthority('OWNER')")
     @GetMapping("/owner/{operatorId}")
-    public ResponseEntity<?> getStationsByOwner(@PathVariable String operatorId) {
+    public ResponseEntity<?> getStationsByOwner(@PathVariable("operatorId") String operatorId) {
         try {
             List<StationModel> stations = stationRepository.findByOperatorId(operatorId);
             return ResponseEntity.ok(stations);

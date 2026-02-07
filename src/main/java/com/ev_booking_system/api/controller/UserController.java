@@ -102,7 +102,7 @@ public class UserController {
     }
 
     @PutMapping("/{email}")
-    public UserDto updateUser(@PathVariable String email, @RequestBody UserDto updatedUser) {
+    public UserDto updateUser(@PathVariable("email") String email, @RequestBody UserDto updatedUser) {
         return userService.updateUser(email, updatedUser);
     }
 
