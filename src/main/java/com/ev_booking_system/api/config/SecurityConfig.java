@@ -50,7 +50,7 @@ public class SecurityConfig {
                                                                 "/ws/**",
                                                                 "/app/**")
                                                 .permitAll()
-                                                .requestMatchers("/api/auth/check").permitAll()
+                                                .requestMatchers("/api/auth/check", "/error").permitAll()
                                                 .anyRequest().authenticated())
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
