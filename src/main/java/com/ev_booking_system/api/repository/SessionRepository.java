@@ -10,6 +10,8 @@ public interface SessionRepository extends MongoRepository<SessionModel, String>
 
     List<SessionModel> findByUsername(String username);
 
+    List<SessionModel> findByUsernameAndActiveTrue(String username);
+
     void deleteByToken(String token);
 
     void deleteByUsername(String username);

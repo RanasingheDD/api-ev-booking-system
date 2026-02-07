@@ -9,52 +9,66 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.http.HttpStatus;
 
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final JwtFilter jwtFilter;
+        private final JwtFilter jwtFilter;
+        private final CustomOAuth2UserService customOAuth2UserService;
+        private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
-    public SecurityConfig(JwtFilter jwtFilter) {
-        this.jwtFilter = jwtFilter;
-    }
+        public SecurityConfig(JwtFilter jwtFilter, CustomOAuth2UserService customOAuth2UserService,
+                        OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler) {
+                this.jwtFilter = jwtFilter;
+                this.customOAuth2UserService = customOAuth2UserService;
+                this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
+        }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-                .cors() // Enable CORS
-                .and()
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for APIs
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/users/login",
-                                "/api/users/register",
-                                "/api/ev_stations/all",
-                                "/api/evs/add",
-                                "/api/evs/all",
-                               // "/api/ev_stations/{id}",
-                                //"/api/ev_stations/add",
-                                "/api/users/evs",
-                                "/api/users/me",
-                                "/api/sessions",
-                                "/api/bookings"
-                        ).permitAll()
-                        .requestMatchers("/api/auth/check").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                http
+                                .cors() // Enable CORS
+                                .and()
+                                .csrf(csrf -> csrf.disable()) // Disable CSRF for APIs
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers(
+                                                                "/api/users/login",
+                                                                "/api/users/register",
+                                                                "/api/ev_stations/all",
+                                                                "/api/evs/add",
+                                                                "/api/evs/all",
+                                                                "/api/ev_stations/{id}",
+                                                                "/api/ev_stations/add",
+                                                                "/api/users/evs",
+                                                                "/api/users/me",
+                                                                "/api/sessions",
+                                                                "/api/bookings",
+                                                                "/ws/**",
+                                                                "/app/**")
+                                                .permitAll()
+                                                .requestMatchers("/api/auth/check").permitAll()
+                                                .anyRequest().authenticated())
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .oauth2Login(oauth2 -> oauth2
+                                                .userInfoEndpoint(userInfo -> userInfo
+                                                                .userService(customOAuth2UserService))
+                                                .successHandler(oAuth2LoginSuccessHandler))
+                                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                                .exceptionHandling(exception -> exception
+                                                .authenticationEntryPoint(
+                                                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
 
-        return http.build();
-    }
+                return http.build();
+        }
 
-    // Password encoder
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        // Password encoder
+        @Bean
+        public BCryptPasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 }
