@@ -30,53 +30,68 @@ public class BookingController {
 
         private final BookingService bookingService;
 
-        @PostMapping("/checkout")
-        public ResponseEntity<Map<String, String>> createCheckoutSession(
-                        @RequestBody BookingModel bookingRequest,
-                        @RequestHeader("Authorization") String token) throws StripeException {
-
-                // 1. Create the booking in DB (Status: PENDING)
-                // This calculates the cost based on your Service logic
-                BookingModel savedBooking = bookingService.createBooking(bookingRequest, token);
-
-                // 2. Configure Stripe (Use your Secret Key)
-                Stripe.apiKey = "";
-
-                // Convert LKR to Cents/Paras (Stripe uses smallest units)
-                long amountInCents = (long) (savedBooking.getFinalCost() * 100);
-                System.out.println(amountInCents);
-
-    @PostMapping("/points")
+    @PostMapping("/checkout")
     public ResponseEntity<Map<String, String>> createCheckoutSession(
             @RequestBody BookingModel bookingRequest,
             @RequestHeader("Authorization") String token) throws StripeException {
 
-                Session session = Session.create(params);
+        // 1. Create the booking in DB (Status: PENDING)
+        // This calculates the cost based on your Service logic
+        BookingModel savedBooking = bookingService.createBooking(bookingRequest, token);
 
-                Map<String, String> response = new HashMap<>();
-                response.put("url", session.getUrl());
-                return ResponseEntity.ok(response);
-        }
+        // 2. Configure Stripe (Use your Secret Key)
+        Stripe.apiKey = "";
 
-        public ResponseEntity<Map<String, String>> getBookingById(@PathVariable String id) {
-                BookingModel booking = bookingService.getById(id);
-                Map<String, String> response = new HashMap<>();
-                response.put("booking_id", booking.getId());
-                response.put("status", booking.getStatus().toString());
-                return ResponseEntity.ok(response);
-        }
+        // Convert LKR to Cents/Paras (Stripe uses smallest units)
+        long amountInCents = (long) (savedBooking.getFinalCost() * 100);
+        System.out.println(amountInCents);
 
-        @GetMapping("/me")
-        public ResponseEntity<List<BookingModel>> getUserBookings(
-                        @RequestHeader("Authorization") String token) {
+        SessionCreateParams params = SessionCreateParams.builder()
+                .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
+                .setMode(SessionCreateParams.Mode.PAYMENT)
+                // Redirect back to React after payment
+                .setSuccessUrl("http://localhost:5173/payment-success?id=" + savedBooking.getId())
+                .setCancelUrl("http://localhost:5173/booking-page")
+                .addLineItem(SessionCreateParams.LineItem.builder()
+                        .setQuantity(1L)
+                        .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
+                                .setCurrency("lkr")
+                                .setUnitAmount(amountInCents)
+                                .setProductData(SessionCreateParams.LineItem.PriceData.ProductData
+                                        .builder()
+                                        .setName("EV Charging: " + savedBooking
+                                                .getStation().getName())
+                                        .setDescription("Slot: " + savedBooking
+                                                .getStartAt()
+                                                .toString())
+                                        .build())
+                                .build())
+                        .build())
+                // Store Booking ID in Stripe Metadata for tracking
+                .putMetadata("booking_id", savedBooking.getId())
+                .build();
 
-                List<BookingModel> bookings = bookingService.getUserBookings(token, null);
-                return ResponseEntity.ok(bookings);
-        }
+        Session session = Session.create(params);
 
         Map<String, String> response = new HashMap<>();
         response.put("url", session.getUrl());
         return ResponseEntity.ok(response);
+    }
+
+    public ResponseEntity<Map<String, String>> getBookingById(@PathVariable String id) {
+        BookingModel booking = bookingService.getById(id);
+        Map<String, String> response = new HashMap<>();
+        response.put("booking_id", booking.getId());
+        response.put("status", booking.getStatus().toString());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<List<BookingModel>> getUserBookings(
+            @RequestHeader("Authorization") String token) {
+
+        List<BookingModel> bookings = bookingService.getUserBookings(token, null);
+        return ResponseEntity.ok(bookings);
     }
 
 
