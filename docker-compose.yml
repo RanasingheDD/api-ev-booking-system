@@ -1,0 +1,12 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    restart: always
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      # Add other environment variables here if you want to override application.properties
+      # e.g., STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
