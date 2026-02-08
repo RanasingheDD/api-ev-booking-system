@@ -1,6 +1,9 @@
 package com.ev_booking_system.api.service;
 
-import com.ev_booking_system.api.Util.JwtUtil;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
@@ -8,17 +11,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ev_booking_system.api.Util.JwtUtil;
 import com.ev_booking_system.api.dto.EvDto;
 import com.ev_booking_system.api.dto.UserDto;
 import com.ev_booking_system.api.mapper.EvMapper;
 import com.ev_booking_system.api.model.EvModel;
-import com.ev_booking_system.api.repository.EvRepository;
 import com.ev_booking_system.api.model.UserModel;
+import com.ev_booking_system.api.repository.EvRepository;
 import com.ev_booking_system.api.repository.UserRepository;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -161,11 +161,26 @@ public class UserService {
     }
 
     public void deleteUser(String email) {
-        sessionService.invalidateAll(email);
-        UserModel user = userRepository.findByEmail(email);
-        if (user != null) {
-            userRepository.delete(user);
+        if (email == null || email.isEmpty()) {
+            return;
         }
+
+        // Get user
+        UserModel user = userRepository.findByEmail(email);
+        if (user == null) {
+            return;
+        }
+
+        String userId = user.getId();
+
+        // Delete all EVs
+        evService.deleteAllUserEvs(userId);
+
+        // Invalidate all sessions
+        sessionService.invalidateAll(email);
+
+        // Delete user
+        userRepository.deleteByEmail(email);
     }
 
     // Update user points

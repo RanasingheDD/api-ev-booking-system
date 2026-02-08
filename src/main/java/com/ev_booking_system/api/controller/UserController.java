@@ -164,11 +164,27 @@ public class UserController {
         return ResponseEntity.ok(dto);
     }
 
+    // @DeleteMapping("/me")
+    // public ResponseEntity<?> deleteAccount(Authentication auth) {
+    //     /// userService.deleteUser(auth.getName()); // deletes user + invalidates
+    //     /// sessions
+    //     return ResponseEntity.ok("Account deleted successfully");
+    // }
     @DeleteMapping("/me")
-    public ResponseEntity<?> deleteAccount(Authentication auth) {
-        /// userService.deleteUser(auth.getName()); // deletes user + invalidates
-        /// sessions
-        return ResponseEntity.ok("Account deleted successfully");
+    public ResponseEntity<?> deleteAccount(@RequestHeader("Authorization") String token) {
+        try {
+            UserModel user = userService.getCurrentUser(token); // get user from token
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+            }
+
+            userService.deleteUser(user.getEmail());
+
+            return ResponseEntity.ok("Account deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to delete account");
+        }
     }
 
     // Helper methods to parse device and OS from User-Agent
