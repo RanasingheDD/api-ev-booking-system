@@ -3,6 +3,7 @@ package com.ev_booking_system.api.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 
 import com.ev_booking_system.api.Util.JwtUtil;
 import com.ev_booking_system.api.dto.BookingQuoteDto;
@@ -109,6 +110,7 @@ public class BookingService {
     }
 
     // Get user bookings
+    @Cacheable(value = "userBookings", key = "#p0")
     public List<BookingModel> getUserBookings(String token, String status) {
 
         if (token != null && token.startsWith("Bearer ")) {

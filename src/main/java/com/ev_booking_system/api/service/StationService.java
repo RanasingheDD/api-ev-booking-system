@@ -21,7 +21,7 @@ public class StationService {
                 .orElseThrow(() -> new RuntimeException("Station not found"));
     }
 
-    @Cacheable(value = "allStations", key = "'all'")
+    @Cacheable(value = "allStations")
     public List<StationModel> getAllStations() {
         return stationRepository.findAll();
     }

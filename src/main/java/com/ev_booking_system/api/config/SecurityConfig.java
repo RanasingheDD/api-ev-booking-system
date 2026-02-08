@@ -45,6 +45,7 @@ public class SecurityConfig {
                                                                 "/api/ev_stations/add",
                                                                 "/api/users/evs",
                                                                 "/api/users/me",
+                                                                "/api/users/evs/delete/{evId}",
                                                                 "/api/sessions",
                                                                 "/api/bookings/checkouts",
                                                                 "/api/bookings/available-slots",

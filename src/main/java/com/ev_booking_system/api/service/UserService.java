@@ -103,6 +103,14 @@ public class UserService {
 
     }
 
+    public EvModel removeEV(String evId, String token) {
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        evService.deleteUserEv(token, evId);
+        return null;
+    }
+
     // @Cacheable(value = "currentUser", key = "'user'")
     public UserModel getCurrentUser(String token) {
         // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -120,6 +128,7 @@ public class UserService {
         }
     }
 
+    @Cacheable(value = "userEvs", key = "#p0")
     public List<EvDto> getUserEv(String token) {
         try {
             if (token != null && token.startsWith("Bearer ")) {

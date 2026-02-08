@@ -26,6 +26,7 @@ import com.ev_booking_system.api.model.EvModel;
 import com.ev_booking_system.api.model.Role;
 import com.ev_booking_system.api.model.UserModel;
 import com.ev_booking_system.api.repository.UserRepository;
+import com.ev_booking_system.api.service.EvService;
 import com.ev_booking_system.api.service.SessionService;
 import com.ev_booking_system.api.service.UserService;
 
@@ -42,6 +43,8 @@ public class UserController {
     private UserRepository userRepository;
     @Autowired
     private SessionService sessionService;
+    @Autowired
+    private EvService evService;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserModel user) {
@@ -100,6 +103,11 @@ public class UserController {
     @PostMapping("/evs")
     public EvModel addEV(@RequestBody EvModel evModel, @RequestHeader("Authorization") String token) {
         return userService.addEV(evModel, token);
+    }
+
+    @PostMapping("/evs/delete/{evId}")
+    public ResponseEntity<?> removeEV(@PathVariable("evId") String evId, @RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(evService.deleteUserEv(token, evId));
     }
 
     @PutMapping("/{email}")
