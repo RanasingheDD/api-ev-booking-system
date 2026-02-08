@@ -3,6 +3,8 @@ package com.ev_booking_system.api.service;
 import com.ev_booking_system.api.Util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -101,6 +103,14 @@ public class UserService {
 
     }
 
+    public EvModel removeEV(String evId, String token) {
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        evService.deleteUserEv(token, evId);
+        return null;
+    }
+
     // @Cacheable(value = "currentUser", key = "'user'")
     public UserModel getCurrentUser(String token) {
         // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -118,6 +128,7 @@ public class UserService {
         }
     }
 
+    @Cacheable(value = "userEvs", key = "#p0")
     public List<EvDto> getUserEv(String token) {
         try {
             if (token != null && token.startsWith("Bearer ")) {
@@ -159,7 +170,7 @@ public class UserService {
         }
     }
 
-//    Update user points
+    // Update user points
     public UserDto getUserPoints(String token) {
         try {
             if (token != null && token.startsWith("Bearer ")) {
@@ -167,19 +178,56 @@ public class UserService {
             }
 
             String userId = jwtUtil.extractUserId(token);
-        UserModel user = userRepository.findById(userId).orElseThrow(null);
-        if (user == null) {
-            throw new RuntimeException("User not found");
-        }
+            UserModel user = userRepository.findById(userId).orElseThrow(null);
+            if (user == null) {
+                throw new RuntimeException("User not found");
+            }
 
-        UserDto dto = new UserDto();
-        dto.setId(user.getId());
-        dto.setName(user.getName());
-        dto.setEmail(user.getEmail());
-        dto.setPoints(user.getPoints());
-        return dto;
-    }catch (Exception e) {
-        return null;}
+            UserDto dto = new UserDto();
+            dto.setId(user.getId());
+            dto.setName(user.getName());
+            dto.setEmail(user.getEmail());
+            dto.setPoints(user.getPoints());
+            return dto;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public ResponseEntity<String> deductUserPoints(String token, int points) {
+        try {
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+            String userId = jwtUtil.extractUserId(token);
+            UserModel user = userRepository.findById(userId).orElseThrow(null);
+            if (user == null) {
+                throw new RuntimeException("User not found");
+            }
+            user.setPoints(user.getPoints() - points);
+            userRepository.save(user);
+            return ResponseEntity.ok("Points deducted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to deduct points");
+        }
+    }
+
+    public ResponseEntity<String> addUserPoints(String token, int points) {
+        try {
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+            String userId = jwtUtil.extractUserId(token);
+            UserModel user = userRepository.findById(userId).orElseThrow(null);
+            if (user == null) {
+                throw new RuntimeException("User not found");
+            }
+            user.setPoints(user.getPoints() + points);
+            userRepository.save(user);
+            return ResponseEntity.ok("Points added successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to deduct points");
+        }
     }
 
     public int deductPoints(String email, int pointsToDeduct) {
