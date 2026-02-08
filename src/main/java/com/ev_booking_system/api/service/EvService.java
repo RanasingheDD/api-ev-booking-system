@@ -38,14 +38,21 @@ public class EvService {
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
-
         String userId = jwtUtil.extractUserId(token);
         Optional<EvModel> ev = evRepository.findById(evId);
-
         if (ev.isPresent() && ev.get().getUserId().equals(userId)) {
             evRepository.deleteById(evId);
             return true;
         }
         return false;
+    }
+
+    // Delete all EVs for a user
+    public void deleteAllUserEvs(String userId) {
+        // Find all EVs for the user
+        var userEvs = evRepository.findByUserId(userId);
+        if (userEvs != null && !userEvs.isEmpty()) {
+            evRepository.deleteAll(userEvs);
+        }
     }
 }
