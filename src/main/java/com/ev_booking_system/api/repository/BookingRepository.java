@@ -13,7 +13,7 @@ public interface BookingRepository extends MongoRepository<BookingModel, String>
     List<BookingModel> findByUserId(String userId);
     List<BookingModel> findByUserIdAndStatus(String userId, BookingStatus status);
     //BookingModel findById(String bookingId);
-    
+    //List<BookingModel> findByStationOperatorId(String operatorId);
     @Query(value = "{" +
             "'stationId': ?0, " +
             "'chargerId': ?1, " +

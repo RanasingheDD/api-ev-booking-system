@@ -54,7 +54,8 @@ public class SecurityConfig {
                                                                 "/users/me/points",
                                                                 "/api/purchases/*",
                                                                 "/ws/**",
-                                                                "/app/**")
+                                                                "/app/**",
+                                                                "/api/messages")
                                                 .permitAll()
                                                 .requestMatchers("/api/auth/check", "/error").permitAll()
                                                 .anyRequest().authenticated())
