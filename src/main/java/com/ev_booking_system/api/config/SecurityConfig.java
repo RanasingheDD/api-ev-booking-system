@@ -46,11 +46,13 @@ public class SecurityConfig {
                                                                 "/api/users/evs",
                                                                 "/api/users/me",
                                                                 "/api/sessions",
-                                                                "/api/bookings",
+                                                                "/api/bookings/checkouts",
+                                                                "/api/bookings/stripe/webhook",
+                                                                "/users/me/points",
                                                                 "/ws/**",
                                                                 "/app/**")
                                                 .permitAll()
-                                                .requestMatchers("/api/auth/check").permitAll()
+                                                .requestMatchers("/api/auth/check", "/error").permitAll()
                                                 .anyRequest().authenticated())
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

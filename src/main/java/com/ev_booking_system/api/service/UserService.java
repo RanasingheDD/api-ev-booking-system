@@ -2,6 +2,7 @@ package com.ev_booking_system.api.service;
 
 import com.ev_booking_system.api.Util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +64,10 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
+    public UserModel getUserById(String id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
     public UserDto loginUser(String email, String password) {
         UserModel user = userRepository.findByEmail(email);
         System.out.println("LOGIN EMAIL = " + email);
@@ -82,47 +87,50 @@ public class UserService {
         String token = jwtUtil.generateToken(user);
 
         // Return UserDto (safe data)
-        return new UserDto(token,user.getId(), user.getName(), user.getEmail(), user.getMobile(),user.getRole(),user.getPoints(),user.getEvIds());
+        return new UserDto(token, user.getId(), user.getName(), user.getEmail(), user.getMobile(), user.getRole(),
+                user.getPoints(), user.getEvIds());
     }
 
-    public EvModel addEV(EvModel evModel,String token) {
+    public EvModel addEV(EvModel evModel, String token) {
 
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
         evModel.setUserId(jwtUtil.extractUserId(token));
-        return evService.addEV(evModel,token);
+        return evService.addEV(evModel, token);
 
     }
 
+    // @Cacheable(value = "currentUser", key = "'user'")
     public UserModel getCurrentUser(String token) {
-        //Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        //String username = auth.getName();
+        // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        // String username = auth.getName();
         try {
             if (token != null && token.startsWith("Bearer ")) {
                 token = token.substring(7);
             }
-    
+
             String userId = jwtUtil.extractUserId(token);
-            return userRepository.findById(userId).orElse(null);
+            return this.getUserById(userId);
         } catch (Exception e) {
-            e.printStackTrace();   // <--- print exception!
+            e.printStackTrace(); // <--- print exception!
             return null;
         }
     }
-    public List<EvDto> getUserEv(String token){
+
+    public List<EvDto> getUserEv(String token) {
         try {
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
 
-        String userId = jwtUtil.extractUserId(token);
-        return evRepository.findByUserId(userId).stream()
-                .map(EvMapper::toDto).collect(Collectors.toList());
+            String userId = jwtUtil.extractUserId(token);
+            return evRepository.findByUserId(userId).stream()
+                    .map(EvMapper::toDto).collect(Collectors.toList());
 
-    } catch (Exception e) {
-        e.printStackTrace();   // <--- print exception!
-        return Collections.emptyList();
+        } catch (Exception e) {
+            e.printStackTrace(); // <--- print exception!
+            return Collections.emptyList();
         }
     }
 
@@ -140,7 +148,6 @@ public class UserService {
         UserDto dto = new UserDto();
         dto.setName(savedUser.getName());
 
-
         return dto;
     }
 
@@ -150,6 +157,29 @@ public class UserService {
         if (user != null) {
             userRepository.delete(user);
         }
+    }
+
+//    Update user points
+    public UserDto getUserPoints(String token) {
+        try {
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+
+            String userId = jwtUtil.extractUserId(token);
+        UserModel user = userRepository.findById(userId).orElseThrow(null);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        UserDto dto = new UserDto();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setPoints(user.getPoints());
+        return dto;
+    }catch (Exception e) {
+        return null;}
     }
 
 }

@@ -1,9 +1,17 @@
 package com.ev_booking_system.api.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 @Data
-public class ChargerModel {
+@NoArgsConstructor
+@AllArgsConstructor
+public class ChargerModel implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String id;
     private String stationId;
@@ -23,7 +31,8 @@ public class ChargerModel {
         CHARGING;
 
         public static ChargerStatus fromString(String value) {
-            if (value == null) return AVAILABLE;
+            if (value == null)
+                return AVAILABLE;
             switch (value.toLowerCase()) {
                 case "available":
                     return AVAILABLE;
@@ -60,8 +69,10 @@ public class ChargerModel {
     }
 
     public String getDisplayName() {
-        if (name != null) return name;
-        if (portNumber != null) return "Port " + portNumber;
+        if (name != null)
+            return name;
+        if (portNumber != null)
+            return "Port " + portNumber;
         return "Port " + id.substring(0, 4);
     }
 

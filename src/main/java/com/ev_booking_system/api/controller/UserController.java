@@ -102,7 +102,7 @@ public class UserController {
     }
 
     @PutMapping("/{email}")
-    public UserDto updateUser(@PathVariable String email, @RequestBody UserDto updatedUser) {
+    public UserDto updateUser(@PathVariable("email") String email, @RequestBody UserDto updatedUser) {
         return userService.updateUser(email, updatedUser);
     }
 
@@ -184,4 +184,45 @@ public class UserController {
         return "Unknown OS";
     }
 
+    @GetMapping("/me/points")
+    public ResponseEntity<UserDto> getUserPoints(@RequestHeader("Authorization") String token) {
+         UserDto user = userService.getUserPoints(token);
+         System.out.println(user.getPoints());
+        return ResponseEntity.ok(userService.getUserPoints(token));
+    }
+
+
+    // private String parseDevice(String userAgent) {
+    //     if (userAgent == null) {
+    //         return "Unknown Device";
+    //     }
+    //     if (userAgent.contains("Mobile")) {
+    //         return "Mobile";
+    //     }
+    //     if (userAgent.contains("Windows")) {
+    //         return "PC";
+    //     }
+    //     if (userAgent.contains("Mac")) {
+    //         return "Mac";
+    //     }
+    //     return "Unknown Device";
+    // }
+    // private String parseOS(String userAgent) {
+    //     if (userAgent == null) {
+    //         return "Unknown OS";
+    //     }
+    //     if (userAgent.contains("Windows")) {
+    //         return "Windows";
+    //     }
+    //     if (userAgent.contains("Linux")) {
+    //         return "Linux";
+    //     }
+    //     if (userAgent.contains("Android")) {
+    //         return "Android";
+    //     }
+    //     if (userAgent.contains("Mac OS")) {
+    //         return "MacOS";
+    //     }
+    //     return "Unknown OS";
+    // }
 }

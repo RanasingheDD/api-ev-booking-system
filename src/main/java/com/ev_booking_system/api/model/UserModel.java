@@ -9,11 +9,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "users")
-public class UserModel {
+public class UserModel implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     private String id;
@@ -25,7 +29,7 @@ public class UserModel {
     private Role role; // USER, OWNER, ADMIN
     private int points;
     private List<String> evIds; // references to EV documents
-    
+
     private AuthProvider authProvider;
     private String providerId;
 
