@@ -50,7 +50,8 @@ public class SecurityConfig {
                                                                 "/api/bookings/stripe/webhook",
                                                                 "/users/me/points",
                                                                 "/ws/**",
-                                                                "/app/**")
+                                                                "/app/**",
+                                                                "/api/messages")
                                                 .permitAll()
                                                 .requestMatchers("/api/auth/check", "/error").permitAll()
                                                 .anyRequest().authenticated())

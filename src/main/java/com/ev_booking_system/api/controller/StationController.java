@@ -85,16 +85,15 @@ public class StationController {
     }
 
     /**
-     * Delete station (NEW ENDPOINT)
+     * Request Delete station (UPDATED: Owner Request Only)
      */
     @PreAuthorize("hasAuthority('OWNER')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteStation(
+    public ResponseEntity<?> requestDeleteStation(
             @PathVariable("id") String id,
             Authentication auth) {
 
         try {
-            // Get existing station
             Optional<StationModel> existingStation = stationRepository.findById(id);
 
             if (existingStation.isEmpty()) {
@@ -102,22 +101,25 @@ public class StationController {
                         .body(Map.of("error", "Station not found"));
             }
 
-            // Optional: Verify ownership
-            // String username = auth.getName();
-            // if (!existingStation.get().getOperatorId().equals(username)) {
-            // return ResponseEntity.status(HttpStatus.FORBIDDEN)
-            // .body(Map.of("error", "You don't have permission to delete this station"));
-            // }
-            // Delete the station
-            stationRepository.deleteById(id);
+            StationModel station = existingStation.get();
+
+            // Check if already requested
+            if (station.isDeleteRequested()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("message", "Delete request already pending."));
+            }
+
+            // Set the flag instead of deleting
+            station.setDeleteRequested(true);
+            stationRepository.save(station);
 
             return ResponseEntity.ok(Map.of(
-                    "message", "Station deleted successfully",
+                    "message", "Delete request sent to Admin successfully.",
                     "id", id));
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to delete station: " + e.getMessage()));
+                    .body(Map.of("error", "Failed to process request: " + e.getMessage()));
         }
     }
 

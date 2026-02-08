@@ -34,5 +34,6 @@ public interface StationRepository extends MongoRepository<StationModel, String>
      * @return List of stations
      */
     List<StationModel> findByAddressContainingIgnoreCase(String address);
+    List<StationModel> findByDeleteRequestedTrue();
 
 }
