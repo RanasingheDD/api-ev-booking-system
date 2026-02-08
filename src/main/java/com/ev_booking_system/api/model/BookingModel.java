@@ -35,6 +35,7 @@ public class BookingModel implements Serializable {
 
     private String qrCode;
     private String evId;
+    private Integer pointsToDeduct;
 
     private Instant createdAt;
 

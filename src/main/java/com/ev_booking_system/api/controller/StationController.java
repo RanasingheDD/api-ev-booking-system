@@ -43,7 +43,11 @@ public class StationController {
 
     @GetMapping("/all")
     public ResponseEntity<?> getAllEvs() {
-        return ResponseEntity.ok(stationService.getAllStations());
+        try {
+            return ResponseEntity.ok(stationService.getAllStations());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Backend error: " + e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")

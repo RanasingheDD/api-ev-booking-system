@@ -21,10 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ev_booking_system.api.dto.EvDto;
 import com.ev_booking_system.api.dto.LoginRequest;
 import com.ev_booking_system.api.dto.UserDto;
+import com.ev_booking_system.api.model.PointsRequest;
 import com.ev_booking_system.api.model.EvModel;
 import com.ev_booking_system.api.model.Role;
 import com.ev_booking_system.api.model.UserModel;
 import com.ev_booking_system.api.repository.UserRepository;
+import com.ev_booking_system.api.service.EvService;
 import com.ev_booking_system.api.service.SessionService;
 import com.ev_booking_system.api.service.UserService;
 
@@ -41,6 +43,8 @@ public class UserController {
     private UserRepository userRepository;
     @Autowired
     private SessionService sessionService;
+    @Autowired
+    private EvService evService;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserModel user) {
@@ -101,6 +105,11 @@ public class UserController {
         return userService.addEV(evModel, token);
     }
 
+    @PostMapping("/evs/delete/{evId}")
+    public ResponseEntity<?> removeEV(@PathVariable("evId") String evId, @RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(evService.deleteUserEv(token, evId));
+    }
+
     @PutMapping("/{email}")
     public UserDto updateUser(@PathVariable("email") String email, @RequestBody UserDto updatedUser) {
         return userService.updateUser(email, updatedUser);
@@ -124,6 +133,22 @@ public class UserController {
         dto.setPoints(user.getPoints());
         dto.setRole(user.getRole());
         return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("me/points/deduct")
+    public ResponseEntity<String> deductPoints(@RequestBody PointsRequest points,
+            @RequestHeader("Authorization") String token) {
+        System.out.println("points deducted");
+        userService.deductUserPoints(token, points.getPoints());
+        return ResponseEntity.ok("Success");
+    }
+
+    @PostMapping("me/points/add")
+    public ResponseEntity<String> addPoints(@RequestBody PointsRequest points,
+            @RequestHeader("Authorization") String token) {
+        System.out.println("points added");
+        userService.addUserPoints(token, points.getPoints());
+        return ResponseEntity.ok("Success");
     }
 
     @PutMapping("/me")
@@ -186,43 +211,42 @@ public class UserController {
 
     @GetMapping("/me/points")
     public ResponseEntity<UserDto> getUserPoints(@RequestHeader("Authorization") String token) {
-         UserDto user = userService.getUserPoints(token);
-         System.out.println(user.getPoints());
+        UserDto user = userService.getUserPoints(token);
+        System.out.println(user.getPoints());
         return ResponseEntity.ok(userService.getUserPoints(token));
     }
 
-
     // private String parseDevice(String userAgent) {
-    //     if (userAgent == null) {
-    //         return "Unknown Device";
-    //     }
-    //     if (userAgent.contains("Mobile")) {
-    //         return "Mobile";
-    //     }
-    //     if (userAgent.contains("Windows")) {
-    //         return "PC";
-    //     }
-    //     if (userAgent.contains("Mac")) {
-    //         return "Mac";
-    //     }
-    //     return "Unknown Device";
+    // if (userAgent == null) {
+    // return "Unknown Device";
+    // }
+    // if (userAgent.contains("Mobile")) {
+    // return "Mobile";
+    // }
+    // if (userAgent.contains("Windows")) {
+    // return "PC";
+    // }
+    // if (userAgent.contains("Mac")) {
+    // return "Mac";
+    // }
+    // return "Unknown Device";
     // }
     // private String parseOS(String userAgent) {
-    //     if (userAgent == null) {
-    //         return "Unknown OS";
-    //     }
-    //     if (userAgent.contains("Windows")) {
-    //         return "Windows";
-    //     }
-    //     if (userAgent.contains("Linux")) {
-    //         return "Linux";
-    //     }
-    //     if (userAgent.contains("Android")) {
-    //         return "Android";
-    //     }
-    //     if (userAgent.contains("Mac OS")) {
-    //         return "MacOS";
-    //     }
-    //     return "Unknown OS";
+    // if (userAgent == null) {
+    // return "Unknown OS";
+    // }
+    // if (userAgent.contains("Windows")) {
+    // return "Windows";
+    // }
+    // if (userAgent.contains("Linux")) {
+    // return "Linux";
+    // }
+    // if (userAgent.contains("Android")) {
+    // return "Android";
+    // }
+    // if (userAgent.contains("Mac OS")) {
+    // return "MacOS";
+    // }
+    // return "Unknown OS";
     // }
 }

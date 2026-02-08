@@ -3,6 +3,7 @@ package com.ev_booking_system.api.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 
 import com.ev_booking_system.api.Util.JwtUtil;
 import com.ev_booking_system.api.dto.BookingQuoteDto;
@@ -12,7 +13,6 @@ import com.ev_booking_system.api.model.ChargerModel;
 import com.ev_booking_system.api.model.StationModel;
 import com.ev_booking_system.api.repository.BookingRepository;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
@@ -33,8 +33,8 @@ public class BookingService {
     public BookingQuoteDto getQuote(String chargerId, String stationId, Instant startAt, Instant endAt) {
 
         double hours = (endAt.getEpochSecond() - startAt.getEpochSecond()) / 3600.0;
-        double rate = 120;
-        double estimatedEnergy = hours * rate;
+        double rate = 1200;
+        double estimatedEnergy = hours * rate * 0.1;
 
         // Check if station is open
         StationModel station = stationService.getStationById(stationId);
@@ -61,7 +61,7 @@ public class BookingService {
                 .startAt(startAt)
                 .endAt(endAt)
                 .estimatedEnergy(estimatedEnergy)
-                .estimatedCost(estimatedEnergy * rate)
+                .estimatedCost(hours * rate)
                 .currency("LKR")
                 .available(availability)
                 .unavailableReason(unavailableReason)
@@ -79,14 +79,14 @@ public class BookingService {
         getQuote(booking.getChargerId(), booking.getStationId(), booking.getStartAt(), booking.getEndAt());
         double hours = (booking.getEndAt().getEpochSecond() - booking.getStartAt().getEpochSecond()) / 3600.0;
 
-        double rate = 120;
+        double rate = 1200;
 
-        double estimatedEnergy = hours * rate;
+        double estimatedEnergy = hours * rate * 0.1;
         booking.setUserId(id);
-        booking.setStatus(BookingStatus.PENDING);
+        booking.setStatus(BookingStatus.CONFIRMED);
         booking.setCreatedAt(Instant.now());
-        booking.setEstimatedCost(estimatedEnergy * rate);
-        booking.setFinalCost(estimatedEnergy * rate);
+        booking.setEstimatedCost(hours * rate);
+        booking.setFinalCost(hours * rate);
 
         StationModel station = stationService.getStationById(booking.getStationId());
         ChargerModel charger = stationService.getChargerById(booking.getStationId(), booking.getChargerId());
@@ -110,6 +110,7 @@ public class BookingService {
     }
 
     // Get user bookings
+    @Cacheable(value = "userBookings", key = "#p0")
     public List<BookingModel> getUserBookings(String token, String status) {
 
         if (token != null && token.startsWith("Bearer ")) {
@@ -118,43 +119,19 @@ public class BookingService {
 
         String userId = jwtUtil.extractUserId(token);
         System.out.println(userId);
-
-        List<BookingModel> bookings;
         if (status != null && !status.isEmpty()) {
 
             try {
                 BookingStatus bookingStatus = BookingModel.BookingStatus.valueOf(status.toUpperCase());
-                bookings = bookingRepo.findByUserIdAndStatus(userId, bookingStatus);
+
+                return bookingRepo.findByUserIdAndStatus(userId, bookingStatus);
+
             } catch (IllegalArgumentException e) {
                 throw new RuntimeException("Invalid booking status: " + status);
             }
-        } else {
-            bookings = bookingRepo.findByUserId(userId);
         }
 
-        // Logic to auto-complete elapsed bookings
-        Instant now = Instant.now();
-        List<BookingModel> updatedBookings = new ArrayList<>();
-        boolean changed = false;
-
-        for (BookingModel booking : bookings) {
-            if (booking.getEndAt() != null && booking.getEndAt().isBefore(now)) {
-                if (booking.getStatus() == BookingStatus.PENDING ||
-                        booking.getStatus() == BookingStatus.CONFIRMED ||
-                        booking.getStatus() == BookingStatus.ACTIVE) {
-
-                    booking.setStatus(BookingStatus.COMPLETED);
-                    updatedBookings.add(booking);
-                    changed = true;
-                }
-            }
-        }
-
-        if (changed) {
-            bookingRepo.saveAll(updatedBookings);
-        }
-
-        return bookings;
+        return bookingRepo.findByUserId(userId);
     }
 
     // Cancel booking
@@ -171,35 +148,8 @@ public class BookingService {
     public boolean checkAvailability(String chargerId, Instant startAt, Instant endAt) {
         List<BookingModel> all = bookingRepo.findAll();
 
-        return all.stream().noneMatch(b -> b.getChargerId().equals(chargerId) &&
-                !(b.getEndAt().isBefore(startAt) || b.getStartAt().isAfter(endAt)));
+        return all.stream()
+                .noneMatch(b -> b.getChargerId().equals(chargerId) && b.getStatus().equals(BookingStatus.CONFIRMED) &&
+                        !(b.getEndAt().isBefore(startAt) || b.getStartAt().isAfter(endAt)));
     }
-
-    public List<Map<String, Object>> getAvailableSlots(
-            String chargerId,
-            Instant dayStart,
-            Instant dayEnd
-    ) {
-        List<Map<String, Object>> slots = new ArrayList<>();
-        Duration slotDuration = Duration.ofMinutes(30); // 30-min slots
-
-        Instant current = dayStart;
-
-        while (current.isBefore(dayEnd)) {
-            Instant next = current.plus(slotDuration);
-
-            boolean available = checkAvailability(chargerId, current, next);
-
-            Map<String, Object> slot = new HashMap<>();
-            slot.put("start", current);
-            slot.put("end", next);
-            slot.put("available", available);
-
-            slots.add(slot);
-            current = next;
-        }
-
-        return slots;
-    }
-
 }
