@@ -152,4 +152,8 @@ public class BookingService {
                         !(b.getEndAt().isBefore(startAt) || b.getStartAt().isAfter(endAt))
         );
     }
+
+//    public List<BookingModel> getBookingsByOwnerId(String ownerId) {
+//        return bookingRepo.findByStationOperatorId(ownerId);
+//    }
 }

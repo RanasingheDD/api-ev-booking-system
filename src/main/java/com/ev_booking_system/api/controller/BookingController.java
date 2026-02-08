@@ -1,6 +1,7 @@
 package com.ev_booking_system.api.controller;
 import com.ev_booking_system.api.service.BookingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import com.stripe.exception.StripeException;
 import com.stripe.param.checkout.SessionCreateParams;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import com.stripe.model.checkout.Session;
 import com.ev_booking_system.api.model.BookingModel;
@@ -67,4 +69,9 @@ public class BookingController {
         response.put("url", session.getUrl());
         return ResponseEntity.ok(response);
     }
+//    @PreAuthorize("hasAuthority('OWNER')")
+//    @GetMapping("/owner/{ownerId}")
+//    public ResponseEntity<List<BookingModel>> getBookingsByOwner(@PathVariable String ownerId) {
+//        return ResponseEntity.ok(bookingService.getBookingsByOwnerId(ownerId));
+//    }
 }
