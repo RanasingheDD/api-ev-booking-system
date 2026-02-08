@@ -182,4 +182,26 @@ public class UserService {
         return null;}
     }
 
+    public int deductPoints(String email, int pointsToDeduct) {
+
+        UserModel user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+
+        if (pointsToDeduct <= 0) {
+            throw new RuntimeException("Invalid points amount");
+        }
+
+        if (user.getPoints() < pointsToDeduct) {
+            throw new RuntimeException("Insufficient points");
+        }
+
+        user.setPoints(user.getPoints() - pointsToDeduct);
+        userRepository.save(user);
+
+        return user.getPoints(); // remaining points
+    }
+
 }
