@@ -32,7 +32,7 @@ public class PaymentService {
 
     public String createCheckoutSession(PaymentDto dto, String token) throws Exception {
 
-        // ✅ Extract userId from token
+        // Extract userId from token
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
@@ -46,7 +46,7 @@ public class PaymentService {
                 .status("PENDING")
                 .build();
 
-        // ✅ Save it to get the generated ID
+        //  Save it to get the generated ID
         PaymentModel savedPayment = paymentRepository.save(payment);
 
         // Stripe Checkout Session
@@ -54,7 +54,7 @@ public class PaymentService {
 
         SessionCreateParams params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl("http://localhost:5173/payment-success?id=" + savedPayment.getId())
+                .setSuccessUrl("http://localhost:5173/app/payment-success?id=" + savedPayment.getId())
                 .setCancelUrl("http://localhost:5173/cancel")
                 .addLineItem(
                         SessionCreateParams.LineItem.builder()

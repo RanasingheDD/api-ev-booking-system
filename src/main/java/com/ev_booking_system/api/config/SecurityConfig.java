@@ -52,6 +52,7 @@ public class SecurityConfig {
                                                                 "/api/bookings/check",
                                                                 "/api/bookings/stripe/webhook",
                                                                 "/users/me/points",
+                                                                "/api/purchases/*",
                                                                 "/ws/**",
                                                                 "/app/**")
                                                 .permitAll()
