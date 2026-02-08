@@ -24,9 +24,13 @@ public class RedisConfig {
                 ObjectMapper objectMapper = new ObjectMapper();
                 objectMapper.registerModule(new JavaTimeModule());
                 objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+                // Enable default typing to include type information in JSON
+                objectMapper.activateDefaultTyping(
+                                objectMapper.getPolymorphicTypeValidator(),
+                                ObjectMapper.DefaultTyping.NON_FINAL,
+                                com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY);
 
-                Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
-                serializer.setObjectMapper(objectMapper);
+                GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
 
                 RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
                                 .entryTtl(Duration.ofSeconds(30))

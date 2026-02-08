@@ -118,20 +118,39 @@ public class BookingService {
         }
 
         String userId = jwtUtil.extractUserId(token);
-        System.out.println(userId);
-        if (status != null && !status.isEmpty()) {
+        List<BookingModel> bookings;
 
+        if (status != null && !status.isEmpty()) {
             try {
                 BookingStatus bookingStatus = BookingModel.BookingStatus.valueOf(status.toUpperCase());
-
-                return bookingRepo.findByUserIdAndStatus(userId, bookingStatus);
-
+                bookings = bookingRepo.findByUserIdAndStatus(userId, bookingStatus);
             } catch (IllegalArgumentException e) {
                 throw new RuntimeException("Invalid booking status: " + status);
             }
+        } else {
+            bookings = bookingRepo.findByUserId(userId);
         }
 
-        return bookingRepo.findByUserId(userId);
+        // Auto-complete logic for elapsed bookings
+        Instant now = Instant.now();
+        List<BookingModel> toUpdate = new ArrayList<>();
+        boolean changed = false;
+
+        for (BookingModel booking : bookings) {
+            if (booking.getEndAt() != null && booking.getEndAt().isBefore(now)) {
+                if (booking.getStatus() == BookingStatus.CONFIRMED || booking.getStatus() == BookingStatus.ACTIVE) {
+                    booking.setStatus(BookingStatus.COMPLETED);
+                    toUpdate.add(booking);
+                    changed = true;
+                }
+            }
+        }
+
+        if (changed) {
+            bookingRepo.saveAll(toUpdate);
+        }
+
+        return bookings;
     }
 
     // Cancel booking
@@ -147,7 +166,6 @@ public class BookingService {
     // Basic availability check
     public boolean checkAvailability(String chargerId, Instant startAt, Instant endAt) {
         List<BookingModel> all = bookingRepo.findAll();
-        System.out.println(all);
 
         return all.stream()
                 .anyMatch(b -> b.getChargerId().equals(chargerId) && b.getStatus().equals(BookingStatus.CONFIRMED) &&

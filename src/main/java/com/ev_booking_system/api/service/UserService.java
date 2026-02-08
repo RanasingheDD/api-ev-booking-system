@@ -111,10 +111,8 @@ public class UserService {
         return null;
     }
 
-    @Cacheable(value = "currentUser", key = "'user'")
+    @Cacheable(value = "currentUser", key = "#p0")
     public UserModel getCurrentUser(String token) {
-        // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        // String username = auth.getName();
         try {
             if (token != null && token.startsWith("Bearer ")) {
                 token = token.substring(7);
