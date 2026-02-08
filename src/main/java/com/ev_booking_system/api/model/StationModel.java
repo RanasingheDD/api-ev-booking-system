@@ -57,4 +57,5 @@ public class StationModel implements Serializable {
     private boolean isOpen;
 
     private Double distance;
+    private boolean deleteRequested = false; // Default is false
 }

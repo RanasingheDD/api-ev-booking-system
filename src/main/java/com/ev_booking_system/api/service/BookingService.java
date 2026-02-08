@@ -47,8 +47,10 @@ public class BookingService {
         }
 
         // Check if slot already booked
-        boolean isBooked = bookingRepo.existsBookingInTimeRange(
-                stationId, chargerId, startAt, endAt);
+        boolean isBooked = checkAvailability(chargerId, startAt, endAt);
+        System.out.println(startAt);
+        System.out.println(endAt);
+        System.out.println(isBooked);
 
         if (isBooked) {
             availability = false;
@@ -109,8 +111,6 @@ public class BookingService {
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
     }
 
-    // Get user bookings
-    @Cacheable(value = "userBookings", key = "#p0")
     public List<BookingModel> getUserBookings(String token, String status) {
 
         if (token != null && token.startsWith("Bearer ")) {
@@ -140,16 +140,17 @@ public class BookingService {
 
         booking.setStatus(BookingStatus.CANCELLED);
         booking.setFinalCost(booking.getFinalCost());
-
+        System.out.println("booking cancelled");
         return bookingRepo.save(booking);
     }
 
     // Basic availability check
     public boolean checkAvailability(String chargerId, Instant startAt, Instant endAt) {
         List<BookingModel> all = bookingRepo.findAll();
+        System.out.println(all);
 
         return all.stream()
-                .noneMatch(b -> b.getChargerId().equals(chargerId) && b.getStatus().equals(BookingStatus.CONFIRMED) &&
+                .anyMatch(b -> b.getChargerId().equals(chargerId) && b.getStatus().equals(BookingStatus.CONFIRMED) &&
                         !(b.getEndAt().isBefore(startAt) || b.getStartAt().isAfter(endAt)));
     }
 }
