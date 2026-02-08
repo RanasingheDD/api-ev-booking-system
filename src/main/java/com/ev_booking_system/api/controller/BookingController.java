@@ -29,7 +29,6 @@ import com.ev_booking_system.api.dto.BookingQuoteDto;
 
 @RestController
 @RequestMapping("/api/bookings")
-@CrossOrigin(origins = "http://localhost:5173") // Your Vite Port
 public class BookingController {
 
         @Autowired

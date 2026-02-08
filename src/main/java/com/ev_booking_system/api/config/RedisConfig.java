@@ -29,7 +29,7 @@ public class RedisConfig {
                 serializer.setObjectMapper(objectMapper);
 
                 RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-                                .entryTtl(Duration.ofMinutes(15))
+                                .entryTtl(Duration.ofSeconds(30))
                                 .serializeValuesWith(
                                                 RedisSerializationContext.SerializationPair
                                                                 .fromSerializer(serializer));

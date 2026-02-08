@@ -111,7 +111,7 @@ public class UserService {
         return null;
     }
 
-    // @Cacheable(value = "currentUser", key = "'user'")
+    @Cacheable(value = "currentUser", key = "'user'")
     public UserModel getCurrentUser(String token) {
         // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         // String username = auth.getName();
@@ -236,7 +236,6 @@ public class UserService {
         if (user == null) {
             throw new RuntimeException("User not found");
         }
-
 
         if (pointsToDeduct <= 0) {
             throw new RuntimeException("Invalid points amount");
