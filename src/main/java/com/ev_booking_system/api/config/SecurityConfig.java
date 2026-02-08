@@ -47,6 +47,8 @@ public class SecurityConfig {
                                                                 "/api/users/me",
                                                                 "/api/sessions",
                                                                 "/api/bookings/checkouts",
+                                                                "/api/bookings/available-slots",
+                                                                "/api/bookings/check",
                                                                 "/api/bookings/stripe/webhook",
                                                                 "/users/me/points",
                                                                 "/ws/**",
