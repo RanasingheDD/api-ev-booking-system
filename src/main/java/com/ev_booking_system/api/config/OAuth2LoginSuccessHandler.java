@@ -36,14 +36,14 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         if (user == null) {
             System.err.println("User not found in DB after OAuth success! Email: " + email);
             // handle error, maybe redirect to error page
-            response.sendRedirect("http://localhost:5173/login?error=user_not_found");
+            response.sendRedirect("https://ev-station-booking.vercel.app/login?error=user_not_found");
             return;
         }
 
         String token = jwtUtil.generateToken(user);
 
         // Change this URL to your frontend's redirect URL
-        String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:5173/oauth2/redirect")
+        String targetUrl = UriComponentsBuilder.fromUriString("https://ev-station-booking.vercel.app/oauth2/redirect")
                 .queryParam("token", token)
                 .build().toUriString();
 
