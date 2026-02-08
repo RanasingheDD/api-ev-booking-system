@@ -191,6 +191,27 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserPoints(token));
     }
 
+    // ➖ Deduct points (used by subscription & booking)
+    @PostMapping("/me/points/deduct")
+    public ResponseEntity<?> deductPoints(
+            @RequestBody UserDto request,
+            Authentication auth
+    ) {
+        String email = auth.getName();
+
+        int remainingPoints = userService.deductPoints(
+                email,
+                request.getPoints()
+        );
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "message", "Points deducted successfully",
+                        "remainingPoints", remainingPoints
+                )
+        );
+    }
+
 
     // private String parseDevice(String userAgent) {
     //     if (userAgent == null) {

@@ -23,8 +23,7 @@ import com.stripe.model.checkout.Session;
 import com.ev_booking_system.api.model.BookingModel;
 
 @RestController
-@RequestMapping("/api/bookings")
-@RequiredArgsConstructor
+@RequestMapping("/api/bookings")@RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:5173") // Your Vite Port
 public class BookingController {
 
