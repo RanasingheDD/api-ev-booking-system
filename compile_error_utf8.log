@@ -1,0 +1,95 @@
+﻿mvn : WARNING: A 
+terminally deprecated 
+method in 
+sun.misc.Unsafe has 
+been called
+At line:1 char:1
++ mvn compile > 
+compile_error.log 2>&1
++ ~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
+    + CategoryInfo    
+          : NotSpeci  
+  fied: (WARNING: A   
+  term...has been     
+called:String) []    
+, RemoteException
+    + FullyQualifiedE 
+   rrorId : NativeCo  
+  mmandError
+ 
+WARNING: sun.misc.Unsa
+fe::staticFieldBase 
+has been called by com
+.google.inject.interna
+l.aop.HiddenClassDefin
+er (file:/D:/maven-mvn
+d-1.0.3-windows-amd64/
+mvn/lib/guice-5.1.0-cl
+asses.jar)
+WARNING: Please 
+consider reporting 
+this to the 
+maintainers of class c
+om.google.inject.inter
+nal.aop.HiddenClassDef
+iner
+WARNING: sun.misc.Unsa
+fe::staticFieldBase 
+will be removed in a 
+future release
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< com.ev-booking-system:api >----------------------
+[INFO] Building api 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ api ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ api ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 40 source files with javac [debug parameters release 17] to target\classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /C:/Users/Dishan/Desktop/api-ev-booking-system/src/main/java/com/ev_booking_system/api/service/StationService.java:[9,2] cannot find symbol
+  symbol: class Service
+[ERROR] /C:/Users/Dishan/Desktop/api-ev-booking-system/src/main/java/com/ev_booking_system/api/service/StationService.java:[15,12] cannot find symbol
+  symbol:   class StationModel
+  location: class com.ev_booking_system.api.service.StationService
+[ERROR] /C:/Users/Dishan/Desktop/api-ev-booking-system/src/main/java/com/ev_booking_system/api/service/StationService.java:[20,17] cannot find symbol
+  symbol:   class StationModel
+  location: class com.ev_booking_system.api.service.StationService
+[ERROR] /C:/Users/Dishan/Desktop/api-ev-booking-system/src/main/java/com/ev_booking_system/api/service/StationService.java:[26,12] cannot find symbol
+  symbol:   class ChargerModel
+  location: class com.ev_booking_system.api.service.StationService
+[INFO] 4 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  17.007 s
+[INFO] Finished at: 2026-02-07T12:59:27+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.14.1:compile (default-compile) on project api: Compilation failure: Compilation failure: 
+[ERROR] /C:/Users/Dishan/Desktop/api-ev-booking-system/src/main/java/com/ev_booking_system/api/service/StationService.java:[9,2] cannot find symbol
+[ERROR]   symbol: class Service
+[ERROR] /C:/Users/Dishan/Desktop/api-ev-booking-system/src/main/java/com/ev_booking_system/api/service/StationService.java:[15,12] cannot find symbol
+[ERROR]   symbol:   class StationModel
+[ERROR]   location: class com.ev_booking_system.api.service.StationService
+[ERROR] /C:/Users/Dishan/Desktop/api-ev-booking-system/src/main/java/com/ev_booking_system/api/service/StationService.java:[20,17] cannot find symbol
+[ERROR]   symbol:   class StationModel
+[ERROR]   location: class com.ev_booking_system.api.service.StationService
+[ERROR] /C:/Users/Dishan/Desktop/api-ev-booking-system/src/main/java/com/ev_booking_system/api/service/StationService.java:[26,12] cannot find symbol
+[ERROR]   symbol:   class ChargerModel
+[ERROR]   location: class com.ev_booking_system.api.service.StationService
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

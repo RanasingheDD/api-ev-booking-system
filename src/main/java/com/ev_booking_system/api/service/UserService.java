@@ -2,6 +2,9 @@ package com.ev_booking_system.api.service;
 
 import com.ev_booking_system.api.Util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +66,10 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
+    public UserModel getUserById(String id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
     public UserDto loginUser(String email, String password) {
         UserModel user = userRepository.findByEmail(email);
         System.out.println("LOGIN EMAIL = " + email);
@@ -79,50 +86,62 @@ public class UserService {
             throw new RuntimeException("Invalid password");
         }
 
-        String token = jwtUtil.generateToken(user.getId());
+        String token = jwtUtil.generateToken(user);
 
         // Return UserDto (safe data)
-        return new UserDto(token,user.getId(), user.getName(), user.getEmail(), user.getMobile(),user.getRole(),user.getPoints(),user.getEvIds());
+        return new UserDto(token, user.getId(), user.getName(), user.getEmail(), user.getMobile(), user.getRole(),
+                user.getPoints(), user.getEvIds());
     }
 
-    public EvModel addEV(EvModel evModel,String token) {
+    public EvModel addEV(EvModel evModel, String token) {
 
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
         evModel.setUserId(jwtUtil.extractUserId(token));
-        return evService.addEV(evModel,token);
+        return evService.addEV(evModel, token);
 
     }
 
+    public EvModel removeEV(String evId, String token) {
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        evService.deleteUserEv(token, evId);
+        return null;
+    }
+
+    // @Cacheable(value = "currentUser", key = "'user'")
     public UserModel getCurrentUser(String token) {
-        //Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        //String username = auth.getName();
+        // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        // String username = auth.getName();
         try {
             if (token != null && token.startsWith("Bearer ")) {
                 token = token.substring(7);
             }
-    
+
             String userId = jwtUtil.extractUserId(token);
-            return userRepository.findById(userId).orElse(null);
+            return this.getUserById(userId);
         } catch (Exception e) {
-            e.printStackTrace();   // <--- print exception!
+            e.printStackTrace(); // <--- print exception!
             return null;
         }
     }
-    public List<EvDto> getUserEv(String token){
+
+    @Cacheable(value = "userEvs", key = "#p0")
+    public List<EvDto> getUserEv(String token) {
         try {
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
 
-        String userId = jwtUtil.extractUserId(token);
-        return evRepository.findByUserId(userId).stream()
-                .map(EvMapper::toDto).collect(Collectors.toList());
+            String userId = jwtUtil.extractUserId(token);
+            return evRepository.findByUserId(userId).stream()
+                    .map(EvMapper::toDto).collect(Collectors.toList());
 
-    } catch (Exception e) {
-        e.printStackTrace();   // <--- print exception!
-        return Collections.emptyList();
+        } catch (Exception e) {
+            e.printStackTrace(); // <--- print exception!
+            return Collections.emptyList();
         }
     }
 
@@ -140,7 +159,6 @@ public class UserService {
         UserDto dto = new UserDto();
         dto.setName(savedUser.getName());
 
-
         return dto;
     }
 
@@ -150,6 +168,88 @@ public class UserService {
         if (user != null) {
             userRepository.delete(user);
         }
+    }
+
+    // Update user points
+    public UserDto getUserPoints(String token) {
+        try {
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+
+            String userId = jwtUtil.extractUserId(token);
+            UserModel user = userRepository.findById(userId).orElseThrow(null);
+            if (user == null) {
+                throw new RuntimeException("User not found");
+            }
+
+            UserDto dto = new UserDto();
+            dto.setId(user.getId());
+            dto.setName(user.getName());
+            dto.setEmail(user.getEmail());
+            dto.setPoints(user.getPoints());
+            return dto;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public ResponseEntity<String> deductUserPoints(String token, int points) {
+        try {
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+            String userId = jwtUtil.extractUserId(token);
+            UserModel user = userRepository.findById(userId).orElseThrow(null);
+            if (user == null) {
+                throw new RuntimeException("User not found");
+            }
+            user.setPoints(user.getPoints() - points);
+            userRepository.save(user);
+            return ResponseEntity.ok("Points deducted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to deduct points");
+        }
+    }
+
+    public ResponseEntity<String> addUserPoints(String token, int points) {
+        try {
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+            String userId = jwtUtil.extractUserId(token);
+            UserModel user = userRepository.findById(userId).orElseThrow(null);
+            if (user == null) {
+                throw new RuntimeException("User not found");
+            }
+            user.setPoints(user.getPoints() + points);
+            userRepository.save(user);
+            return ResponseEntity.ok("Points added successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to deduct points");
+        }
+    }
+
+    public int deductPoints(String email, int pointsToDeduct) {
+
+        UserModel user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+
+        if (pointsToDeduct <= 0) {
+            throw new RuntimeException("Invalid points amount");
+        }
+
+        if (user.getPoints() < pointsToDeduct) {
+            throw new RuntimeException("Insufficient points");
+        }
+
+        user.setPoints(user.getPoints() - pointsToDeduct);
+        userRepository.save(user);
+
+        return user.getPoints(); // remaining points
     }
 
 }

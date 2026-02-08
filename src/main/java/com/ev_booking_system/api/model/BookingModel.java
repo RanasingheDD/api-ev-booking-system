@@ -6,12 +6,16 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 
+import java.io.Serializable;
+
 @Document(collection = "bookings")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BookingModel {
+public class BookingModel implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     @Id
     private String id;
 
@@ -31,11 +35,12 @@ public class BookingModel {
 
     private String qrCode;
     private String evId;
+    private Integer pointsToDeduct;
 
     private Instant createdAt;
-    
+
     private StationModel station;
-    private ChargerModel charger; 
+    private ChargerModel charger;
 
     public enum BookingStatus {
         PENDING,
@@ -46,8 +51,5 @@ public class BookingModel {
         EXPIRED,
         NO_SHOW
     }
-    
+
 }
-
-
-

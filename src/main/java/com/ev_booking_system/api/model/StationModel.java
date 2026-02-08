@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,11 +13,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Document(collection = "ev_stations")
 @AllArgsConstructor
 @Data
 @NoArgsConstructor
-public class StationModel {
+public class StationModel implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     private String id;
@@ -48,6 +53,7 @@ public class StationModel {
 
     private List<String> amenities = new ArrayList<>();
 
+    @JsonProperty("isOpen")
     private boolean isOpen;
 
     private Double distance;

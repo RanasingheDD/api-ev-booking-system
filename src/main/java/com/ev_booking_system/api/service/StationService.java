@@ -1,9 +1,9 @@
 package com.ev_booking_system.api.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.ev_booking_system.api.model.ChargerModel;
@@ -21,16 +21,20 @@ public class StationService {
                 .orElseThrow(() -> new RuntimeException("Station not found"));
     }
 
+    @Cacheable(value = "allStations")
+    public List<StationModel> getAllStations() {
+        return stationRepository.findAll();
+    }
+
     public List<StationModel> searchStations(String query) {
         List<StationModel> results = stationRepository.searchByKeyword(query);
         return results.stream()
                 .toList();
     }
 
-        public ChargerModel getChargerById(String stationId, String chargerId) {
+    public ChargerModel getChargerById(String stationId, String chargerId) {
         // Get station
-        StationModel station = stationRepository.findById(stationId)
-                .orElseThrow(() -> new RuntimeException("Station not found"));
+        StationModel station = this.getStationById(stationId);
 
         // Find matching charger
         return station.getChargers().stream()
@@ -39,5 +43,4 @@ public class StationService {
                 .orElseThrow(() -> new RuntimeException("Charger not found"));
     }
 
-    
 }
