@@ -111,7 +111,7 @@ public class UserService {
         return null;
     }
 
-    @Cacheable(value = "currentUser", key = "#p0")
+    // @Cacheable(value = "currentUser", key = "#p0")
     public UserModel getCurrentUser(String token) {
         try {
             if (token != null && token.startsWith("Bearer ")) {
@@ -126,7 +126,7 @@ public class UserService {
         }
     }
 
-    @Cacheable(value = "userEvs", key = "#p0")
+    // @Cacheable(value = "userEvs", key = "#p0")
     public List<EvDto> getUserEv(String token) {
         try {
             if (token != null && token.startsWith("Bearer ")) {

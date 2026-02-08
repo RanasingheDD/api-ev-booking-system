@@ -53,9 +53,9 @@ public class PaymentService {
 
                 SessionCreateParams params = SessionCreateParams.builder()
                                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                                .setSuccessUrl("https://ev-station-booking.vercel.app/payment-success?id="
+                                .setSuccessUrl("https://evwebapi.mywire.org/app/payment-success?id="
                                                 + savedPayment.getId())
-                                .setCancelUrl("https://ev-station-booking.vercel.app/cancel")
+                                .setCancelUrl("https://evwebapi.mywire.org/app/cancel")
                                 .addLineItem(
                                                 SessionCreateParams.LineItem.builder()
                                                                 .setQuantity(1L)
