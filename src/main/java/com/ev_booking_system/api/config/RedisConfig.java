@@ -18,24 +18,24 @@ import java.time.Duration;
 @Configuration
 public class RedisConfig {
 
-        @Bean
-        public RedisCacheManager cacheManager(RedisConnectionFactory factory) {
+    @Bean
+    public RedisCacheManager cacheManager(RedisConnectionFactory factory) {
 
-                ObjectMapper objectMapper = new ObjectMapper();
-                objectMapper.registerModule(new JavaTimeModule());
-                objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-                Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
-                serializer.setObjectMapper(objectMapper);
+        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
+        serializer.setObjectMapper(objectMapper);
 
-                RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-                                .entryTtl(Duration.ofHours(1))
-                                .serializeValuesWith(
-                                                RedisSerializationContext.SerializationPair
-                                                                .fromSerializer(serializer));
+        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofHours(1))
+                .serializeValuesWith(
+                        RedisSerializationContext.SerializationPair
+                                .fromSerializer(serializer));
 
-                return RedisCacheManager.builder(factory)
-                                .cacheDefaults(config)
-                                .build();
-        }
+        return RedisCacheManager.builder(factory)
+                .cacheDefaults(config)
+                .build();
+    }
 }
